@@ -1,11 +1,5 @@
 #include <string>
 #include <fstream>
-#include <stddef.h>
-#include <assert.h>
-#include <limits>
-#include <stdlib.h>
-#include <float.h>
-#include <string.h>
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
