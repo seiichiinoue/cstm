@@ -1,19 +1,19 @@
-#include <unordered_set>
 #include <cassert>
 #include <cmath>
 #include <random>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
 #include <numeric>
 #include <limits>
-#include <fstream>
-#include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <boost/random.hpp>
 #include "sampler.hpp"
+#include "vocab.hpp"
 
 #define PI 3.14159265358979323846
 #define NDIM_D 2                // 文書,単語ベクトルの次元数
@@ -52,5 +52,52 @@ public:
 
     CSTM();
     ~CSTM();
+
+    void add_word(id word_id, int doc_id);
+    double generate_noise_from_standard_normal_distribution();
+    double generate_noise_doc();
+    double generate_noise_word();
+    double *generate_vector();
+    double *draw_word_vector(double *old_vec);
+    double *draw_doc_vector(double *old_vec);
+    double draw_alpha0(double old_alpha0);
+    double sum_alpha_word_given_doc(int doc_id);
+
+    double compute_alpha_word_given_doc(id word_id, int doc_id);
+    double _compute_alpha_word(double *word_vec, double *doc_vec, double g0);
+    double compute_reduced_log_probability_document(id word_id, int doc_id);
+    double _compute_reduced_log_probability_document(id word_id, int doc_id, int n_k, double Zi, double alpha_k);
+    double compute_log_probability_document(int doc_id);
+    double compute_log_probability_document_given_words(int doc_id, unordered_set<id> &word_ids);
+    double _compute_second_term_of_log_probability_document(int doc_id, id word_id);
+    double compute_log_prior_alpha0(double alpha0);
+    double compute_log_Pvector_doc(double *new_vec, double *old_vec);
+    double compute_log_Pvector_word(double *new_vec, double *old_vec);
+    double _compute_log_Pvector_given_sigma(double *new_vec, double *old_vec, double *sigma);
+    double compute_log_prior_vector(double *vec);
+
+    double get_alpha();
+    double get_g0_of_word(id word_id);
+    int get_sum_word_frequency_of_doc(int doc_id);
+    double *get_doc_vector(int doc_id);
+    double *get_word_vector(id word_id);
+    int get_word_count_in_doc(id word_id, int doc_id);
+    int get_word_count(id word_id);
+    int get_ignore_word_count();
+    double get_Zi(int doc_id);
+
+    void set_ndim_d(int ndim_d);
+    void set_alpha0(double alpha0);
+    void set_sigma_u(double sigma_u);
+    void set_sigma_phi(double sigma_phi);
+    void set_sigma_alpha(double sigma_alpha);
+    void set_gamma_alpha_a(double gamma_alpha_a);
+    void set_gamma_alpha_b(double gamma_alpha_b);
+    void set_size_vocabulary(int vocabulary_size);
+    void set_ignore_word_count(int count);
+    void set_word_vector(id word_id, double *source);
+    void set_doc_vector(int doc_id, double *source);
+    void update_Zi(int doc_id);
+    void set_Zi(int doc_id, double new_value);
 
 };
