@@ -1,8 +1,3 @@
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/serialization/split_free.hpp>
 #include <unordered_set>
 #include <cassert>
 #include <cmath>
@@ -43,6 +38,8 @@ public:
     CSTM();
     ~CSTM();
 
+    void initialize(int ndim_d, int vocabulary_size, int num_documents);
+    void prepare(void);
     void add_word(id word_id, int doc_id);
     double generate_noise_from_standard_normal_distribution();
     double generate_noise_doc();
@@ -63,10 +60,10 @@ public:
     double compute_log_prior_alpha0(double alpha0);
     double compute_log_Pvector_doc(double *new_vec, double *old_vec);
     double compute_log_Pvector_word(double *new_vec, double *old_vec);
-    double _compute_log_Pvector_given_sigma(double *new_vec, double *old_vec, double *sigma);
+    double _compute_log_Pvector_given_sigma(double *new_vec, double *old_vec, double sigma);
     double compute_log_prior_vector(double *vec);
 
-    double get_alpha();
+    double get_alpha0();
     double get_g0_of_word(id word_id);
     int get_sum_word_frequency_of_doc(int doc_id);
     double *get_doc_vector(int doc_id);
@@ -83,6 +80,7 @@ public:
     void set_sigma_alpha(double sigma_alpha);
     void set_gamma_alpha_a(double gamma_alpha_a);
     void set_gamma_alpha_b(double gamma_alpha_b);
+    void set_num_documents(int num_documents);
     void set_size_vocabulary(int vocabulary_size);
     void set_ignore_word_count(int count);
     void set_word_vector(id word_id, double *source);
