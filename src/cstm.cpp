@@ -85,3 +85,21 @@ double CSTM::compute_reduced_log_probability_document(id word_id, int doc_id) {
     double alpha_k = compute_alpha_word_given_doc(word_id, doc_id);
     return _compute_reduced_log_probability_document(word_id, doc_id, n_k, Zi, alpha_k);
 }
+double CSTM::_compute_reduced_log_probability_document(id word_id, int doc_id, int n_k, double Zi, double alpha_k) {
+    double log_pw = 0;
+    double sum_word_frequency = _sum_n_k[doc_id];
+    log_pw += lgamma(Zi) - lgamma(Zi + sum_word_frequency);
+    if (n_k == 0) {
+        return log_pw;
+    }
+    if (n_k > 10) {
+        log_pw += lgamma(alpha_k + n_k) - lgamma(alpha_k);
+    } else {
+        double tmp = 0;
+        for (int i=0; i<n_k; ++i) {
+            tmp += log(alpha_k + i);
+        }
+        log_pw += tmp;
+    }
+    return log_pw;
+}
