@@ -1,27 +1,17 @@
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/split_free.hpp>
+#include <unordered_set>
 #include <cassert>
 #include <cmath>
 #include <random>
 #include <fstream>
-#include <sstream>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <numeric>
-#include <limits>
-#include <unordered_map>
-#include <unordered_set>
-#include <boost/random.hpp>
+#include "common.hpp"
 #include "sampler.hpp"
-#include "vocab.hpp"
 
 #define PI 3.14159265358979323846
-#define NDIM_D 2                // 文書,単語ベクトルの次元数
-#define SIGMA_U 0.01            // 文書ベクトののランダムウォーク幅
-#define SIGMA_PHI 0.02          // 単語ベクトルのランダムウォーク幅
-#define SIGMA_ALPHA 0.2         // a0のランダムウォーク幅
-#define GAMMA_ALPHA_A 5         // a0のガンマ事前分布のハイパーパラメータ
-#define GAMMA_ALPHA_B 1         // a0がガンマ事前分のはハイパーパラメータ
 
 class CSTM {
 public:
@@ -34,7 +24,7 @@ public:
     double **_doc_vectors;      // 文書ベクトル
     int _ndim_d;
     int _num_documents;
-    int _vocabrary_size;
+    int _vocabulary_size;
     int _sum_word_frequency;    // 全単語の出現回の総和
     int _ignore_word_count;
     double _sigma_u;
