@@ -123,6 +123,11 @@ double CSTM::compute_alpha_word_given_doc(id word_id, int doc_id) {
     double g0 = get_g0_of_word(word_id);
     return _compute_alpha_word(word_vec, doc_vec, g0);
 }
+double CSTM::_compute_alpha_word(double *word_vec, double *doc_vec, double g0) {
+    double f = inner(word_vec, doc_vec, _ndim_d);
+    double alpha = _alpha0 * g0 * exp(f);
+    return alpha;
+}
 double CSTM::compute_reduced_log_probability_document(id word_id, int doc_id) {
     double log_pw = 0;
     double Zi = _Zi[doc_id];
@@ -197,6 +202,9 @@ double CSTM::compute_log_prior_alpha0(double alpha0) {
 }
 double CSTM::compute_log_Pvector_doc(double *new_vec, double *old_vec) {
     return _compute_log_Pvector_given_sigma(new_vec, old_vec, _sigma_u);
+}
+double CSTM::compute_log_Pvector_word(double *new_vec, double *old_vec) {
+    return _compute_log_Pvector_given_sigma(new_vec, old_vec, _sigma_phi);
 }
 double CSTM::_compute_log_Pvector_given_sigma(double *new_vec, double *old_vec, double sigma) {
     double log_pvec = (double)_ndim_d * log(1.0 / (sqrt(2.0 * PI) * sigma));
