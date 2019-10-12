@@ -13,7 +13,7 @@ CSTM::CSTM() {
     _n_k = NULL;
     _word_count = NULL;
     _sum_n_k = NULL;
-    _Zi = NULL;
+    _Zi = NULL;         // Z_d = \Sigma \alpha_{d, k}
     _log_likelihood_first_term = NULL;
     _tmp_vec = NULL;
     _vocabulary_size = 0;
@@ -123,11 +123,14 @@ double CSTM::compute_alpha_word_given_doc(id word_id, int doc_id) {
     double g0 = get_g0_of_word(word_id);
     return _compute_alpha_word(word_vec, doc_vec, g0);
 }
+// compute alpha: \alpha_{d, k} = \alpha_0 * G_0(w_k) * \exp(\phi(w_k)^T * u_d)
 double CSTM::_compute_alpha_word(double *word_vec, double *doc_vec, double g0) {
-    double f = inner(word_vec, doc_vec, _ndim_d);
+    double f = inner(word_vec, doc_vec, _ndim_d);   // inner product
     double alpha = _alpha0 * g0 * exp(f);
     return alpha;
 }
+// compute probability: \p_d (w | \alpha_d, n_d)
+// update probability per compute alpha
 double CSTM::compute_reduced_log_probability_document(id word_id, int doc_id) {
     double log_pw = 0;
     double Zi = _Zi[doc_id];
@@ -142,6 +145,7 @@ double CSTM::_compute_reduced_log_probability_document(id word_id, int doc_id, i
     double log_pw = 0;
     double sum_word_frequency = _sum_n_k[doc_id];
     log_pw += lgamma(Zi) - lgamma(Zi + sum_word_frequency);
+    // if-else conditional for speed up
     if (n_k == 0) {
         return log_pw;
     }
