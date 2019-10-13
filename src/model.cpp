@@ -4,12 +4,11 @@
 #include <set>
 #include <unordered_set>
 #include <unordered_map> 
-
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-
-#include "cstm.hpp"
+#include "cstm.cpp"
 #include "vocab.hpp"
+using namespace cstm;
 
 template<typename T>
 struct multiset_comparator {
@@ -304,7 +303,7 @@ public:
             unordered_set<id> &word_ids = _word_ids_in_doc[doc_id];
             log_pw += _cstm->compute_log_probability_document_given_words(doc_id, word_ids);
         }
-        return exp(-log_pw / get_sum_word_frequency());
+        return cstm::exp(-log_pw / get_sum_word_frequency());
     }
     void update_all_Zi() {
         for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
@@ -361,7 +360,7 @@ public:
         double log_prior_new = _cstm->compute_log_prior_vector(new_word_vec);
         // acceptance rate
         double log_acceptance_rate = log_pw_new + log_prior_new - log_pw_old - log_prior_old;
-        double acceptance_ratio = std::min(1.0, exp(log_acceptance_rate));
+        double acceptance_ratio = std::min(1.0, cstm::exp(log_acceptance_rate));
         double bernoulli = sampler::uniform(0, 1);
         if (bernoulli <= acceptance_ratio) {
             _num_acceptance_word += 1;
@@ -403,7 +402,7 @@ public:
         double log_prior_new = _cstm->compute_log_prior_vector(new_doc_vec);
         // acceptance rate
         double log_acceptance_rate = log_pw_new + log_prior_new - log_pw_old - log_prior_old;
-        double acceptance_ratio = std::min(1.0, exp(log_acceptance_rate));
+        double acceptance_ratio = std::min(1.0, cstm::exp(log_acceptance_rate));
         double bernoulli = sampler::uniform(0, 1);
         if (bernoulli <= acceptance_ratio) {
             _num_acceptance_doc += 1;
@@ -441,7 +440,7 @@ public:
         double log_prior_new = _cstm->compute_log_prior_alpha0(new_alpha0);
         // acceptance rate
         double log_acceptance_rate = log_pw_new + log_prior_new - log_pw_old - log_prior_old;
-        double acceptance_ratio = std::min(1.0, exp(log_acceptance_rate));
+        double acceptance_ratio = std::min(1.0, cstm::exp(log_acceptance_rate));
         double bernoulli = sampler::uniform(0, 1);
         if (bernoulli <= acceptance_ratio) {
             _num_acceptance_alpha0 += 1;
