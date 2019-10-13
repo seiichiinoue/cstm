@@ -1,4 +1,5 @@
 #include "cstm.hpp"
+using namespace cstm;
 
 CSTM::CSTM() {
     _ndim_d = NDIM_D;
@@ -108,7 +109,7 @@ double *CSTM::draw_doc_vector(double *old_vec) {
 }
 double CSTM::draw_alpha0(double old_alpha0) {
     double z = _noise_alpha0(sampler::minstd);
-    return old_alpha0 * exp(z);
+    return old_alpha0 * cstm::exp(z);
 }
 double CSTM::sum_alpha_word_given_doc(int doc_id) {
     double sum = 0;
@@ -125,8 +126,8 @@ double CSTM::compute_alpha_word_given_doc(id word_id, int doc_id) {
 }
 // compute alpha: \alpha_{d, k} = \alpha_0 * G_0(w_k) * \exp(\phi(w_k)^T * u_d)
 double CSTM::_compute_alpha_word(double *word_vec, double *doc_vec, double g0) {
-    double f = inner(word_vec, doc_vec, _ndim_d);   // inner product
-    double alpha = _alpha0 * g0 * exp(f);
+    double f = cstm::inner(word_vec, doc_vec, _ndim_d);   // inner product
+    double alpha = _alpha0 * g0 * cstm::exp(f);
     return alpha;
 }
 // compute probability: \p_d (w | \alpha_d, n_d)
