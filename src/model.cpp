@@ -4,6 +4,10 @@
 #include <set>
 #include <unordered_set>
 #include <unordered_map> 
+
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+
 #include "cstm.hpp"
 #include "vocab.hpp"
 
@@ -71,7 +75,6 @@ public:
     double *_Zi_cache;
     
     int _ndim_d;
-    int _num_threads;
     int _ignored_vocabulary_size;
     std::thread *_doc_threads;
 
@@ -105,7 +108,6 @@ public:
         _Zi_cache = NULL;
         _doc_threads = NULL;
         _ndim_d = NULL;
-        // _num_threads = 1;
         _ignored_vocabulary_size = 0;
         reset_statistics();
         _random_sampling_doc_index = 0;
@@ -124,7 +126,7 @@ public:
         int _num_doc_vec_sampled = 0;
     }
 
-    void initialize() {
+    void prepare() {
         int num_docs = _dataset.size();
         int vocabulary_size = _word_frequency.size();
         // CSTM
@@ -261,9 +263,6 @@ public:
         double *new_vec = _cstm->draw_doc_vector(old_vec);
         std::memcpy(_new_vec_copy, new_vec, _cstm->_ndim_d * sizeof(double));
         return _new_vec_copy;
-    }
-    void set_num_threads(int num_threads){
-        _num_threads = num_threads;
     }
     void set_ignore_word_count(int count){
         _cstm->set_ignore_word_count(count);
@@ -457,3 +456,35 @@ public:
         return false;
     }
 };
+
+DEFINE_int32(NDIM, 20, "Number of hidden size");
+DEFINE_int32(IGNORE, 10, "Number of ignore word");
+DEFINE_int32(EPOCH, 100000, "Num of epoch");
+DEFINE_string(DATA, "data/wiki-wakati.txt", "Data file");
+
+int main() {
+    CSTMTrainer trainer;
+    trainer.set_ndim_d(FLAGS_NDIM);
+    trainer.set_sigma_u(0.02);
+    trainer.set_sigma_phi(0.04);
+    trainer.set_sigma_alpha0(0.2);
+    trainer.set_gamma_alpha_a(5);
+    trainer.set_gamma_alpha_b(500);
+    trainer.set_ignore_word_count(FLAGS_IGNORE);
+    
+    // read file
+    int doc_id = trainer.add_document(FLAGS_DATA);
+
+    // initialize
+    trainer.prepare();
+    
+    // training
+    for (int i=0; i<FLAGS_EPOCH; ++i) {
+        trainer.perform_mh_sampling_document();
+        trainer.perform_mh_sampling_word();
+        trainer.perform_mh_sampling_alpha0();
+        trainer.reset_statistics();
+    }
+    // save model
+    return 0;
+}
