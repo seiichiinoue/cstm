@@ -474,10 +474,8 @@ int main() {
     
     // read file
     int doc_id = trainer.add_document(FLAGS_DATA);
-
     // initialize
     trainer.prepare();
-    
     // training
     for (int i=0; i<FLAGS_EPOCH; ++i) {
         trainer.perform_mh_sampling_document();
