@@ -25,7 +25,7 @@ ABSTRACT:
 - prepare text data with mecab-python3
 
 ```bash
-$ python utils/text.py
+$ python utils/text.py --tar_path data/kokoro.txt --wakati_path data/kokoro-wakati.txt
 ```
 
 - training CSTM
