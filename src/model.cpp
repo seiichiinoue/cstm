@@ -6,7 +6,7 @@
 #include <unordered_map> 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include "cstm.cpp"
+#include "cstm.hpp"
 #include "vocab.hpp"
 using namespace cstm;
 
@@ -459,7 +459,7 @@ public:
 DEFINE_int32(NDIM, 20, "Number of hidden size");
 DEFINE_int32(IGNORE, 10, "Number of ignore word");
 DEFINE_int32(EPOCH, 100000, "Num of epoch");
-DEFINE_string(DATA, "data/wiki-wakati.txt", "Data file");
+DEFINE_string(DATA, "./data/kokoro-wakati.txt", "Data file");
 
 int main() {
     CSTMTrainer trainer;
