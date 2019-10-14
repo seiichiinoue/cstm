@@ -19,7 +19,7 @@ ABSTRACT:
 
 ```bash
 $ make
-$ ./cstm -NDIM=20 -IGNORE=10 -EPOCH=100000 
+$ ./cstm -NDIM=20 -IGNORE=10 -EPOCH=100
 ```
 
 ## Reference
