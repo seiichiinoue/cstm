@@ -2,8 +2,10 @@
 *
 
 # allow any
+!*/
 !*.cpp
 !*.hpp
+!*.py
 !*.md
 !.gitignore
 !makefile
