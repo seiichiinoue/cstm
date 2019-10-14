@@ -113,7 +113,10 @@ public:
         _random_sampling_doc_index = 0;
         _random_sampling_word_index = 0;
     }
-    ~CSTMTrainer() {}
+    ~CSTMTrainer() {
+        delete _cstm;
+        delete _vocab;
+    }
 
     void reset_statistics() {
         int _num_acceptance_doc = 0;    
@@ -493,7 +496,7 @@ public:
 };
 
 DEFINE_int32(NDIM, 20, "Number of hidden size");
-DEFINE_int32(IGNORE, 10, "Number of ignore word");
+DEFINE_int32(IGNORE, 0, "Number of ignore word");
 DEFINE_int32(EPOCH, 10, "Num of EPOCH");
 DEFINE_string(DATA, "./data/kokoro-wakati.txt", "Data file");
 DEFINE_string(MODEL, "./data/cstm.model", "Saveplace of model");
@@ -517,7 +520,10 @@ int main() {
         for (int j=0; j<10000; ++j) {
             trainer.perform_mh_sampling_document();
             trainer.perform_mh_sampling_word();
-            trainer.perform_mh_sampling_alpha0();
+            // updating alpha0 is bottleneck
+            if (j % 1000 == 0) {
+                trainer.perform_mh_sampling_alpha0();
+            }
         }
         std::cout << "epoch " << i+1 << "/" << FLAGS_EPOCH << std::endl;
         // logging temporary result
