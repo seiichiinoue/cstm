@@ -1,13 +1,20 @@
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/unordered_set.hpp>
+#include <gflags/gflags.h>
+#include <glog/logging.h>
 #include <iostream>
 #include <thread>
 #include <string>
 #include <set>
 #include <unordered_set>
 #include <unordered_map> 
-#include <gflags/gflags.h>
-#include <glog/logging.h>
 #include "cstm.hpp"
 #include "vocab.hpp"
+using namespace boost;
 using namespace cstm;
 
 template<typename T>
@@ -453,12 +460,43 @@ public:
         }
         return false;
     }
+    void save(string filename) {
+        std::ofstream ofs(filename);
+        boost::archive::binary_oarchive oarchive(ofs);
+        oarchive << *_vocab;
+        oarchive << *_cstm;
+        oarchive << _word_frequency;
+        oarchive << _word_ids_in_doc;
+        oarchive << _docs_containing_word;
+        oarchive << _sum_word_frequency;
+        oarchive << _doc_filename_to_id;
+        oarchive << _doc_id_to_filename;
+    }
+    bool load(string filename) {
+        std::ifstream ifs(filename);
+        if (ifs.good()) {
+            _vocab = new Vocab();
+            _cstm = new CSTM();
+            boost::archive::binary_iarchive iarchive(ifs);
+            iarchive >> *_vocab;
+            iarchive >> *_cstm;
+            iarchive >> _word_frequency;
+            iarchive >> _word_ids_in_doc;
+            iarchive >> _docs_containing_word;
+            iarchive >> _sum_word_frequency;
+            iarchive >> _doc_filename_to_id;
+            iarchive >> _doc_id_to_filename;
+            return true;
+        }
+        return false;
+    }
 };
 
 DEFINE_int32(NDIM, 20, "Number of hidden size");
 DEFINE_int32(IGNORE, 10, "Number of ignore word");
 DEFINE_int32(EPOCH, 10, "Num of EPOCH");
 DEFINE_string(DATA, "./data/kokoro-wakati.txt", "Data file");
+DEFINE_string(MODEL, "./data/cstm.model", "Saveplace of model");
 
 int main() {
     CSTMTrainer trainer;
@@ -481,13 +519,17 @@ int main() {
             trainer.perform_mh_sampling_word();
             trainer.perform_mh_sampling_alpha0();
         }
-        std::cout << "epoch " << i << "/" << FLAGS_EPOCH << std::endl;
+        std::cout << "epoch " << i+1 << "/" << FLAGS_EPOCH << std::endl;
+        // logging temporary result
+        std::cout << "perplexity: " << trainer.compute_perplexity() << std::endl;
+        std::cout << "log likelihood: " << trainer.compute_log_likelihood_data() << std::endl;
+        // logging statistics
         std::cout << "MH acceptance:" << std::endl;
-        std::cout << "\tdocument: " << trainer.get_mh_acceptance_rate_for_doc_vector() << std::endl;
-        std::cout << "\tword: " << trainer.get_mh_acceptance_rate_for_word_vector() << std::endl;
-        std::cout << "\talpha: " << trainer.get_mh_acceptance_rate_for_alpha0() << std::endl;
+        std::cout << "    document: " << trainer.get_mh_acceptance_rate_for_doc_vector() << std::endl;
+        std::cout << "    word: " << trainer.get_mh_acceptance_rate_for_word_vector() << std::endl;
+        std::cout << "    alpha0: " << trainer.get_mh_acceptance_rate_for_alpha0() << std::endl;
+        trainer.save(FLAGS_MODEL);
         trainer.reset_statistics();
     }
-    // save model
     return 0;
 }
