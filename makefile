@@ -5,7 +5,7 @@ FMATH = -fomit-frame-pointer -fno-operator-names -msse2 -mfpmath=sse -march=nati
 LDFLAGS = -lglog -lgflags
 
 cstm:
-	$(CC) -o cstm src/model.cpp $(INCLUDE) $(BOOST) $(FMATH) $(LDFLAGS)
+	$(CC) -o cstm src/model.cpp $(LLDB) $(INCLUDE) $(BOOST) $(FMATH) $(LDFLAGS)
 
 clean:
 	rm -f cstm
