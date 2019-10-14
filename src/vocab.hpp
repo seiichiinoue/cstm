@@ -17,6 +17,12 @@ namespace cstm {
         id add_string(wstring &str) {
             id hash = hash_string(str);
             auto itr = _hash_to_id.find(hash);
+            if (itr==_hash_to_id.end()) {
+                id word_id = _hash_to_id.size();
+                _string_by_word_id[word_id] = str;
+                _hash_to_id[hash] = word_id;
+                return word_id;
+            }
             return itr->second;
         }
         id get_word_id(wstring &str) {
