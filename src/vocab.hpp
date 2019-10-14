@@ -1,12 +1,12 @@
-#include <string>
-#include <fstream>
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/unordered_map.hpp>
-#include "fmath.hpp"
+#include <string>
+#include <fstream>
+#include "common.hpp"
 using namespace std;
-using id = size_t;
+
 namespace cstm {
     class Vocab {
     public:
@@ -48,6 +48,12 @@ namespace cstm {
         }
         int num_words() {
             return _string_by_word_id.size();
+        }
+        // serialize
+        template<class Archive>
+        void serialize(Archive &archive, unsigned int version) {
+            archive & _string_by_word_id;
+            archive & _hash_to_id;
         }
     };
 }
