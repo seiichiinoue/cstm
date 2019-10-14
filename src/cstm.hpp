@@ -48,7 +48,7 @@ namespace cstm {
             _n_k = NULL;
             _word_count = NULL;
             _sum_n_k = NULL;
-            _Zi = NULL;         // Z_d = \Sigma \alpha_{d, k}
+            _Zi = NULL;     // Z_d = \Sigma \alpha_{d, k}
             _log_likelihood_first_term = NULL;
             _tmp_vec = NULL;
             _vocabulary_size = 0;
@@ -65,6 +65,27 @@ namespace cstm {
             _vocabulary_size = vocabulary_size;
             // hyper params
             _alpha0 = 1;
+            // secure memory 
+            _tmp_vec = generate_vector();
+            _g0 = new double[vocabulary_size];
+            _word_vectors = new double*[vocabulary_size];
+            _doc_vectors = new double*[num_documents];
+            _n_k = new int*[num_documents];
+            _sum_n_k = new int[num_documents];
+            _Zi = new double[num_documents];
+            _log_likelihood_first_term = new double[num_documents];
+            for (id word_id=0; word_id<vocabulary_size; ++word_id) {
+                _word_vectors[word_id] = generate_vector();
+            }
+            for (int doc_id=0; doc_id<num_documents; ++ doc_id) {
+                _doc_vectors[doc_id] = generate_vector();
+                _n_k[doc_id] = new int[vocabulary_size];
+                _Zi[doc_id] = 0;
+                for (id word_id=0; word_id<vocabulary_size; ++word_id) {
+                    _n_k[doc_id][word_id] = 0;
+                }
+            }
+            _word_count = new int[vocabulary_size];
         }
         void prepare(void) {
             // basis distribution
