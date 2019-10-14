@@ -68,14 +68,11 @@ public:
     
     double *_old_vec_copy;
     double *_new_vec_copy;
-    double **_old_vec_copy_thread;
-    double **_new_vec_copy_thread;
     double *_old_alpha_words;
     double *_Zi_cache;
     
     int _ndim_d;
     int _ignored_vocabulary_size;
-    std::thread *_doc_threads;
 
     // stat
     // times of acceptance 
@@ -101,12 +98,9 @@ public:
         _vocab = new Vocab();
         _old_vec_copy = NULL;
         _new_vec_copy = NULL;
-        _old_vec_copy_thread = NULL;
-        _new_vec_copy_thread = NULL;
         _old_alpha_words = NULL;
         _Zi_cache = NULL;
-        _doc_threads = NULL;
-        _ndim_d = NULL;
+        _ndim_d = 0;
         _ignored_vocabulary_size = 0;
         reset_statistics();
         _random_sampling_doc_index = 0;
@@ -128,6 +122,9 @@ public:
     void prepare() {
         int num_docs = _dataset.size();
         int vocabulary_size = _word_frequency.size();
+        // cache
+        _old_vec_copy = new double[_ndim_d];
+        _new_vec_copy = new double[_ndim_d];
         // CSTM
         _cstm->initialize(_ndim_d, vocabulary_size, num_docs);
         for (int doc_id=0; doc_id<num_docs; ++doc_id) {
@@ -146,6 +143,8 @@ public:
         for (int doc_id=0; doc_id<num_docs; ++doc_id) {
             _cstm->update_Zi(doc_id);
         }
+        _old_alpha_words = new double[num_docs];
+        _Zi_cache = new double[num_docs];
         // random sampling of words
         for (id word_id=0; word_id<vocabulary_size; ++word_id) {
             _num_updates_word[word_id] = 0;
@@ -458,7 +457,7 @@ public:
 
 DEFINE_int32(NDIM, 20, "Number of hidden size");
 DEFINE_int32(IGNORE, 10, "Number of ignore word");
-DEFINE_int32(EPOCH, 100000, "Num of epoch");
+DEFINE_int32(EPOCH, 10, "Num of EPOCH");
 DEFINE_string(DATA, "./data/kokoro-wakati.txt", "Data file");
 
 int main() {
@@ -477,9 +476,16 @@ int main() {
     trainer.prepare();
     // training
     for (int i=0; i<FLAGS_EPOCH; ++i) {
-        trainer.perform_mh_sampling_document();
-        trainer.perform_mh_sampling_word();
-        trainer.perform_mh_sampling_alpha0();
+        for (int j=0; j<10000; ++j) {
+            trainer.perform_mh_sampling_document();
+            trainer.perform_mh_sampling_word();
+            trainer.perform_mh_sampling_alpha0();
+        }
+        std::cout << "epoch " << i << "/" << FLAGS_EPOCH << std::endl;
+        std::cout << "MH acceptance:" << std::endl;
+        std::cout << "\tdocument: " << trainer.get_mh_acceptance_rate_for_doc_vector() << std::endl;
+        std::cout << "\tword: " << trainer.get_mh_acceptance_rate_for_word_vector() << std::endl;
+        std::cout << "\talpha: " << trainer.get_mh_acceptance_rate_for_alpha0() << std::endl;
         trainer.reset_statistics();
     }
     // save model
