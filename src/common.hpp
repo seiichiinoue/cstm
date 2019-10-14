@@ -1,6 +1,7 @@
+#pragma once
 #include <iostream>
 #include <cmath>
-
+#include "fmath.hpp"
 #define NDIM_D 2                // 文書,単語ベクトルの次元数
 #define SIGMA_U 0.01            // 文書ベクトののランダムウォーク幅
 #define SIGMA_PHI 0.02          // 単語ベクトルのランダムウォーク幅
