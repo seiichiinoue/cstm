@@ -517,11 +517,11 @@ int main() {
     trainer.prepare();
     // training
     for (int i=0; i<FLAGS_EPOCH; ++i) {
-        for (int j=0; j<10000; ++j) {
+        for (int j=0; j<1000; ++j) {
             trainer.perform_mh_sampling_document();
             trainer.perform_mh_sampling_word();
             // updating alpha0 is bottleneck
-            if (j % 1000 == 0) {
+            if (j % 100 == 0) {
                 trainer.perform_mh_sampling_alpha0();
             }
         }
