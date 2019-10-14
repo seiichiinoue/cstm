@@ -1,5 +1,10 @@
 # Continuous Space Topic Model
 
+## Todo
+
+- model saving, vector saving
+- script for plot vector
+
 ## Description
 
 the implementation of [Modeling Text through Gaussian Processes](http://chasen.org/~daiti-m/paper/nl213cstm.pdf)
@@ -16,6 +21,14 @@ ABSTRACT:
 - gflag 2.2.2
 
 ## Usage
+
+- prepare text data with mecab-python3
+
+```bash
+$ python utils/text.py
+```
+
+- training CSTM
 
 ```bash
 $ make
