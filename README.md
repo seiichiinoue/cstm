@@ -38,5 +38,4 @@ $ ./cstm -NDIM=20 -IGNORE=0 -EPOCH=100
 ## Reference
 
 - [Modeling Text through Gaussian Processes](http://chasen.org/~daiti-m/paper/nl213cstm.pdf)
-
 - [musyoku.github.io](http://musyoku.github.io/)
