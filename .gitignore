@@ -13,3 +13,4 @@
 
 # ignore 
 old/*
+cstm.dSYM/*
