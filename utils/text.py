@@ -10,7 +10,7 @@ class Text(object):
         for i in range(len(self.text)):
             self.text[i] = self.text[i].replace("\n", "")
 
-    def _wakati(self, path):
+    def _wakati_ja(self, path):
         wakatied = []
         for i in range(len(self.text)):
             new_t = self.wakati.parse(self.text[i]).strip("\n")
@@ -20,11 +20,26 @@ class Text(object):
             for t in wakatied:
                 f.write(t+'\n')
         return None
+    
+    def _wakati_en(self, path):
+        wakatied = []
+        for i in range(len(self.text)):
+            new_t = self.text[i].split(" ").strip("\n")
+            wakatied.append(new_t)
+        with open(path, "w") as f:
+            for t in wakatied:
+                f.write(t+'\n')
+        return None
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='this script for text processing.')
+    parser.add_argument('--lang_type', help='english or japanese')
     parser.add_argument('--tar_path', help='text file path you want to process')
     parser.add_argument('--wakati_save_path', help='path you wanto to save processed text')
     args = parser.parse_args()
-    t = Text(args.tar_path)
-    t._wakati(args.wakati_save_path)
+    if args.lang_type.lower() == 'japanese':
+        t = Text(args.tar_path)
+        t._wakati_ja(args.wakati_save_path)
+    else:
+        t = Text(args.tar_path)
+        t._wakati_en(args.wakati_save_path)
