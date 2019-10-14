@@ -1,8 +1,9 @@
+#pragma once
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/split_free.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include <boost/serialization/split_free.hpp>
 #include <unordered_set>
 #include <cassert>
 #include <cmath>
@@ -10,6 +11,7 @@
 #include <fstream>
 #include "common.hpp"
 #include "sampler.hpp"
+using namespace std;
 #define PI 3.14159265358979323846
 
 namespace cstm {
@@ -62,7 +64,7 @@ namespace cstm {
             _ignore_word_count = 0;
             _standard_normal_distribution = normal_distribution<double>(0, 1);
         }
-        ~CSTM();
+        ~CSTM() {};
 
         void initialize(int ndim_d, int vocabulary_size, int num_documents) {
             _ndim_d = ndim_d;
@@ -357,60 +359,77 @@ namespace cstm {
         void set_Zi(int doc_id, double new_value) {
             _Zi[doc_id] = new_value;
         }
-
+        template<class Archive>
+        void serialize(Archive &archive, unsigned int version) {
+            boost::serialization::split_free(archive, *this, version);
+        }
+        void save(string filename) {
+            std::ofstream ofs(filename);
+            boost::archive::binary_oarchive oarchive(ofs);
+            oarchive << *this;
+        }
+        bool load(string filename) {
+            std::ifstream ifs(filename);
+            if (ifs.good()) {
+                boost::archive::binary_iarchive iarchive(ifs);
+                iarchive >> *this;
+                return true;
+            }
+            return false;
+        }
     };
 }
 // save model
 namespace boost { namespace serialization {
 template<class Archive>
     void save(Archive &archive, const cstm::CSTM &cstm, unsigned int version) {
-        archive &cstm._ndim_d;
-        archive &cstm._num_documents;
-        archive &cstm._vocabulary_size;
-        archive &cstm._sum_word_frequency;
-        archive &cstm._sigma_u;
-        archive &cstm._sigma_phi;
-        archive &cstm._sigma_alpha0;
-        archive &cstm._alpha0;
+        archive & cstm._ndim_d;
+        archive & cstm._num_documents;
+        archive & cstm._vocabulary_size;
+        archive & cstm._sum_word_frequency;
+        archive & cstm._sigma_u;
+        archive & cstm._sigma_phi;
+        archive & cstm._sigma_alpha0;
+        archive & cstm._alpha0;
         for (int doc_id=0; doc_id<cstm._num_documents; ++doc_id) {
-            archive &cstm._Zi[doc_id];
-            archive &cstm._sum_n_k[doc_id];
-            archive &cstm._log_likelihood_first_term[doc_id];
+            archive & cstm._Zi[doc_id];
+            archive & cstm._sum_n_k[doc_id];
+            archive & cstm._log_likelihood_first_term[doc_id];
         }
         for (int doc_id=0; doc_id<cstm._num_documents; ++doc_id) {
             for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
-                archive &cstm._n_k[doc_id][word_id];
+                archive & cstm._n_k[doc_id][word_id];
             }
         }
         for (int doc_id=0; doc_id<cstm._num_documents; ++doc_id) {
             double *vec = cstm._doc_vectors[doc_id];
             for (int i=0; i<cstm._ndim_d; ++i) {
-                archive &vec[i];
+                archive & vec[i];
             }
         }
         for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
             double *vec = cstm._word_vectors[word_id];
             for (int i=0; i<cstm._ndim_d; ++i) {
-                archive &vec[i];
+                archive & vec[i];
             }
         }
         for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
-            archive &cstm._word_count[word_id];
+            archive & cstm._word_count[word_id];
         }
         for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
-            archive &cstm._g0[word_id];
+            archive & cstm._g0[word_id];
         }
     }
 template<class Archive>
     void load(Archive &archive, cstm::CSTM &cstm, unsigned int version) {
-        archive &cstm._ndim_d;
-        archive &cstm._num_documents;
-        archive &cstm._vocabulary_size;
-        archive &cstm._sum_word_frequency;
-        archive &cstm._sigma_u;
-        archive &cstm._sigma_phi;
-        archive &cstm._sigma_alpha0;
-        archive &cstm._alpha0;
+        archive & cstm._ndim_d;
+        archive & cstm._num_documents;
+        archive & cstm._vocabulary_size;
+        archive & cstm._sum_word_frequency;
+        archive & cstm._sigma_u;
+        archive & cstm._sigma_phi;
+        archive & cstm._sigma_alpha0;
+        archive & cstm._alpha0;
         if (cstm._word_vectors == NULL) {
             cstm._word_vectors = new double*[cstm._vocabulary_size];
             for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
@@ -442,35 +461,35 @@ template<class Archive>
             cstm._word_count = new int[cstm._vocabulary_size];
         }
         for (int doc_id=0; doc_id<cstm._num_documents; ++doc_id) {
-            archive &cstm._Zi[doc_id];
-            archive &cstm._sum_n_k[doc_id];
-            archive &cstm._log_likelihood_first_term[doc_id];
+            archive & cstm._Zi[doc_id];
+            archive & cstm._sum_n_k[doc_id];
+            archive & cstm._log_likelihood_first_term[doc_id];
         }
         for (int doc_id=0; doc_id<cstm._num_documents; ++doc_id) {
             for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
-                archive &cstm._n_k[doc_id][word_id];
+                archive & cstm._n_k[doc_id][word_id];
             }
         }
         for (int doc_id=0; doc_id<cstm._num_documents; ++doc_id) {
             double *vec = cstm._doc_vectors[doc_id];
             for (int i=0; i<cstm._ndim_d; ++i) {
-                archive &vec[i];
+                archive & vec[i];
             }
         }
         for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
             double *vec = cstm._word_vectors[word_id];
             for (int i=0; i<cstm._ndim_d; ++i) {
-                archive &vec[i];
+                archive & vec[i];
             }
         }
         for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
-            archive &cstm._word_count[word_id];
+            archive & cstm._word_count[word_id];
         }
         if (cstm._g0 == NULL) {
             cstm._g0 = new double[cstm._vocabulary_size];
         }
         for (id word_id=0; word_id<cstm._vocabulary_size; ++word_id) {
-            archive &cstm._g0[word_id];
+            archive & cstm._g0[word_id];
         }
     }
 }}  // namespace boost::serialization
