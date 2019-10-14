@@ -9,6 +9,7 @@
 !*.md
 !.gitignore
 !makefile
+!data/*
 
 # ignore 
 old/*
