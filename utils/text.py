@@ -40,6 +40,8 @@ if __name__ == '__main__':
     if args.lang_type.lower() == 'japanese':
         t = Text(args.tar_path)
         t._wakati_ja(args.wakati_save_path)
-    else:
+    elif args.lang_type.lower() == 'english':
         t = Text(args.tar_path)
         t._wakati_en(args.wakati_save_path)
+    else:
+        print("Error: this script does not support language of got file")
