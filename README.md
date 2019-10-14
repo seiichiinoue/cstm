@@ -32,7 +32,7 @@ $ python utils/text.py --tar_path data/kokoro.txt --wakati_path data/kokoro-waka
 
 ```bash
 $ make
-$ ./cstm -NDIM=20 -IGNORE=10 -EPOCH=100
+$ ./cstm -NDIM=20 -IGNORE=0 -EPOCH=100
 ```
 
 ## Reference
