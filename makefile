@@ -5,3 +5,8 @@ LDFLAGS = -lglog -lgflags
 
 cstm:
 	$(CC) -o cstm src/model.cpp $(INCLUDE) $(BOOST) $(FMATH) $(LDFLAGS)
+
+clean:
+	rm -f cstm
+
+.PHONY: clean
