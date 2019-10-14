@@ -64,7 +64,7 @@ namespace cstm {
             _ignore_word_count = 0;
             _standard_normal_distribution = normal_distribution<double>(0, 1);
         }
-        ~CSTM() {};
+        ~CSTM() {}
 
         void initialize(int ndim_d, int vocabulary_size, int num_documents) {
             _ndim_d = ndim_d;
@@ -117,7 +117,7 @@ namespace cstm {
                 sum_word_frequency_check += sum;
             }
             assert(sum_word_frequency_check == _sum_word_frequency);
-            for (int doc_id = 0; doc_id<+_num_documents; ++doc_id) {
+            for (int doc_id=0; doc_id<_num_documents; ++doc_id) {
                 double log_pw = 0;
                 for (int i=2; i<=_sum_n_k[doc_id]; ++i) {
                     log_pw += log(i);
@@ -157,13 +157,13 @@ namespace cstm {
         }
         double *draw_word_vector(double *old_vec) {
             for (int i=0; i<_ndim_d; ++i) {
-                _tmp_vec[i] = old_vec[i]+generate_noise_word();
+                _tmp_vec[i] = old_vec[i] + generate_noise_word();
             }
             return _tmp_vec;
         }
         double *draw_doc_vector(double *old_vec) {
             for (int i=0; i<_ndim_d; ++i) {
-                _tmp_vec[i] = old_vec[i]+generate_noise_doc();
+                _tmp_vec[i] = old_vec[i] + generate_noise_doc();
             }
             return _tmp_vec;
         }
