@@ -7,6 +7,10 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
+#include <algorithm>
+#include <iterator>
+#include <cstdlib>
+#include <dirent.h>
 #include <string>
 #include <set>
 #include <unordered_set>
@@ -56,6 +60,11 @@ void split_word_by(const wstring &str, wchar_t delim, vector<wstring> &elems) {
     if (!item.empty()) {
         elems.push_back(item);
     }
+}
+
+bool ends_with(const std::string& s, const std::string& suffix) {
+    if (s.size() < suffix.size()) return false;
+    return std::equal(std::rbegin(suffix), std::rend(suffix), std::rbegin(s));
 }
 
 class CSTMTrainer {
@@ -503,10 +512,11 @@ DEFINE_int32(gamma_alpha_a, 5, "params: gamma_alpha_a");
 DEFINE_int32(gamma_alpha_b, 500, "params: gamma_alpha_b");
 DEFINE_int32(ignore_word_count, 0, "number of ignore word");
 DEFINE_int32(epoch, 10, "num of epoch");
-DEFINE_string(data_path, "./data/kokoro-wakati.txt", "input data file path");
-DEFINE_string(model_path, "./data/cstm.model", "saveplace of model");
+DEFINE_string(data_path, "./data/train/", "directory input data located");
+DEFINE_string(model_path, "./model/cstm.model", "saveplace of model");
 
 int main() {
+    // set hyper parameter
     CSTMTrainer trainer;
     trainer.set_ndim_d(FLAGS_ndim_d);
     trainer.set_sigma_u(FLAGS_sigma_u);
@@ -515,10 +525,22 @@ int main() {
     trainer.set_gamma_alpha_a(FLAGS_gamma_alpha_a);
     trainer.set_gamma_alpha_b(FLAGS_gamma_alpha_b);
     trainer.set_ignore_word_count(FLAGS_ignore_word_count);
-    
     // read file
-    int doc_id = trainer.add_document(FLAGS_data_path);
-    // initialize
+    const char* path = FLAGS_data_path.c_str();
+    DIR *dp;
+    dp = opendir(path);
+    assert (dp != NULL);
+    dirent* entry = readdir(dp);
+    while (entry != NULL){
+        const char *cstr = entry->d_name;
+        string file_path = string(cstr);
+        if (ends_with(file_path, ".txt")) {
+            std::cout << "loading " << file_path << std::endl;
+            int doc_id = trainer.add_document(FLAGS_data_path + file_path);
+        }
+        entry = readdir(dp);
+    }
+    // prepare model
     trainer.prepare();
     // training
     for (int i=0; i<FLAGS_epoch; ++i) {
