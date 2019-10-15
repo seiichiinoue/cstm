@@ -9,9 +9,11 @@
 !*.md
 !.gitignore
 !makefile
-!data/*.txt
+!data/raw/*
+!data/train/*
 
 # ignore 
+model/*
 old/*
 # for debug
 cstm.dSYM/*
