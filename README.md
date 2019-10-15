@@ -18,7 +18,7 @@ trained latent word vector(corpus: NIPS, dim: 20)
 
 ## Environment
 
-- C++ 11
+- C++ 17+
 - clang++ 10.0
 - boost 1.71.0
 - glog 0.4.0
