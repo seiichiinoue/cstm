@@ -496,16 +496,16 @@ public:
 };
 
 // hyper parameters setting
-DEFINE_int32(ndim_d, 20, "Number of hidden size");
+DEFINE_int32(ndim_d, 20, "number of hidden size");
 DEFINE_double(sigma_u, 0.02, "params: sigma_u");
 DEFINE_double(sigma_phi, 0.04, "params: sigma_phi");
 DEFINE_double(sigma_alpha0, 0.2, "params: sigma_alpha0");
 DEFINE_int32(gamma_alpha_a, 5, "params: gamma_alpha_a");
 DEFINE_int32(gamma_alpha_b, 500, "params: gamma_alpha_b");
-DEFINE_int32(ignore_word_count, 0, "Number of ignore word");
-DEFINE_int32(epoch, 10, "Num of EPOCH");
-DEFINE_string(data_path, "./data/kokoro-wakati.txt", "Data file");
-DEFINE_string(model_path, "./data/cstm.model", "Saveplace of model");
+DEFINE_int32(ignore_word_count, 0, "number of ignore word");
+DEFINE_int32(epoch, 10, "num of epoch");
+DEFINE_string(data_path, "./data/kokoro-wakati.txt", "input data file path");
+DEFINE_string(model_path, "./data/cstm.model", "saveplace of model");
 
 int main() {
     CSTMTrainer trainer;
