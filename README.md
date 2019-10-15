@@ -29,7 +29,7 @@ trained latent word vector(corpus: NIPS, dim: 20)
 - prepare text data with mecab-python3
 
 ```bash
-$ python utils/text.py --lang_type japanese --tar_path data/kokoro.txt --wakati_path data/kokoro-wakati.txt
+$ python utils/text.py --lang_type japanese --tar_path data/raw/kokoro.txt --save_path data/train/kokoro.txt
 ```
 
 - training CSTM with MCMC
