@@ -13,4 +13,5 @@
 
 # ignore 
 old/*
+# for debug
 cstm.dSYM/*
