@@ -495,28 +495,34 @@ public:
     }
 };
 
-DEFINE_int32(NDIM, 20, "Number of hidden size");
-DEFINE_int32(IGNORE, 0, "Number of ignore word");
-DEFINE_int32(EPOCH, 10, "Num of EPOCH");
-DEFINE_string(DATA, "./data/kokoro-wakati.txt", "Data file");
-DEFINE_string(MODEL, "./data/cstm.model", "Saveplace of model");
+// hyper parameters setting
+DEFINE_int32(ndim_d, 20, "Number of hidden size");
+DEFINE_double(sigma_u, 0.02, "params: sigma_u");
+DEFINE_double(sigma_phi, 0.04, "params: sigma_phi");
+DEFINE_double(sigma_alpha0, 0.2, "params: sigma_alpha0");
+DEFINE_int32(gamma_alpha_a, 5, "params: gamma_alpha_a");
+DEFINE_int32(gamma_alpha_b, 500, "params: gamma_alpha_b");
+DEFINE_int32(ignore_word_count, 0, "Number of ignore word");
+DEFINE_int32(epoch, 10, "Num of EPOCH");
+DEFINE_string(data_path, "./data/kokoro-wakati.txt", "Data file");
+DEFINE_string(model_path, "./data/cstm.model", "Saveplace of model");
 
 int main() {
     CSTMTrainer trainer;
-    trainer.set_ndim_d(FLAGS_NDIM);
-    trainer.set_sigma_u(0.02);
-    trainer.set_sigma_phi(0.04);
-    trainer.set_sigma_alpha0(0.2);
-    trainer.set_gamma_alpha_a(5);
-    trainer.set_gamma_alpha_b(500);
-    trainer.set_ignore_word_count(FLAGS_IGNORE);
+    trainer.set_ndim_d(FLAGS_ndim_d);
+    trainer.set_sigma_u(FLAGS_sigma_u);
+    trainer.set_sigma_phi(FLAGS_sigma_phi);
+    trainer.set_sigma_alpha0(FLAGS_sigma_alpha0);
+    trainer.set_gamma_alpha_a(FLAGS_gamma_alpha_a);
+    trainer.set_gamma_alpha_b(FLAGS_gamma_alpha_b);
+    trainer.set_ignore_word_count(FLAGS_ignore_word_count);
     
     // read file
-    int doc_id = trainer.add_document(FLAGS_DATA);
+    int doc_id = trainer.add_document(FLAGS_data_path);
     // initialize
     trainer.prepare();
     // training
-    for (int i=0; i<FLAGS_EPOCH; ++i) {
+    for (int i=0; i<FLAGS_epoch; ++i) {
         for (int j=0; j<1000; ++j) {
             trainer.perform_mh_sampling_document();
             trainer.perform_mh_sampling_word();
@@ -525,7 +531,7 @@ int main() {
                 trainer.perform_mh_sampling_alpha0();
             }
         }
-        std::cout << "epoch " << i+1 << "/" << FLAGS_EPOCH << std::endl;
+        std::cout << "epoch " << i+1 << "/" << FLAGS_epoch << std::endl;
         // logging temporary result
         std::cout << "perplexity: " << trainer.compute_perplexity() << std::endl;
         std::cout << "log likelihood: " << trainer.compute_log_likelihood_data() << std::endl;
@@ -534,7 +540,7 @@ int main() {
         std::cout << "    document: " << trainer.get_mh_acceptance_rate_for_doc_vector() << std::endl;
         std::cout << "    word: " << trainer.get_mh_acceptance_rate_for_word_vector() << std::endl;
         std::cout << "    alpha0: " << trainer.get_mh_acceptance_rate_for_alpha0() << std::endl;
-        trainer.save(FLAGS_MODEL);
+        trainer.save(FLAGS_model_path);
         trainer.reset_statistics();
     }
     return 0;
