@@ -14,7 +14,7 @@ ABSTRACT:
 
 trained latent word vector(corpus: NIPS, dim: 20)
 
-![](https://seiichiinoue.github.io/img/cstm_result.png)
+![cstm_plot](https://seiichiinoue.github.io/img/cstm_result.png)
 
 ## Environment
 
@@ -36,7 +36,7 @@ $ python utils/text.py --lang_type japanese --tar_path data/kokoro.txt --wakati_
 
 ```bash
 $ make
-$ ./cstm -NDIM=20 -IGNORE=0 -EPOCH=100
+$ ./cstm -n_dim=20 -ignore_word_count=0 -epoch=100 -data_path=[string: your data] -model_path=[string: saveplace]
 ```
 
 ## Reference
