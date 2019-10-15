@@ -32,7 +32,7 @@ trained latent word vector(corpus: NIPS, dim: 20)
 $ python utils/text.py --lang_type japanese --tar_path data/kokoro.txt --wakati_path data/kokoro-wakati.txt
 ```
 
-- training CSTM
+- training CSTM with MCMC
 
 ```bash
 $ make
