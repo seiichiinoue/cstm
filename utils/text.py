@@ -35,13 +35,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='this script for text processing.')
     parser.add_argument('--lang_type', help='english or japanese')
     parser.add_argument('--tar_path', help='text file path you want to process')
-    parser.add_argument('--wakati_save_path', help='path you wanto to save processed text')
+    parser.add_argument('--save_path', help='path you wanto to save processed text')
     args = parser.parse_args()
     if args.lang_type.lower() == 'japanese':
         t = Text(args.tar_path)
-        t._wakati_ja(args.wakati_save_path)
+        t._wakati_ja(args.save_path)
     elif args.lang_type.lower() == 'english':
         t = Text(args.tar_path)
-        t._wakati_en(args.wakati_save_path)
+        t._wakati_en(args.save_path)
     else:
         print("Error: this script does not support language of got file")
