@@ -503,7 +503,7 @@ public:
     }
 };
 
-// hyper parameters setting
+// hyper parameters flags
 DEFINE_int32(ndim_d, 20, "number of hidden size");
 DEFINE_double(sigma_u, 0.02, "params: sigma_u");
 DEFINE_double(sigma_phi, 0.04, "params: sigma_phi");
@@ -542,6 +542,10 @@ int main() {
     }
     // prepare model
     trainer.prepare();
+    // summary
+    std::cout << "vocabulary size: " << trainer.get_vocabulary_size() << std::endl;
+    std::cout << "num of documents: " << trainer.get_num_documents() << std::endl;
+    std::cout << "num of words: " << trainer.get_sum_word_frequency() << std:: endl;
     // training
     for (int i=0; i<FLAGS_epoch; ++i) {
         for (int j=0; j<1000; ++j) {
