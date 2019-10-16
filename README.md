@@ -36,7 +36,7 @@ $ python utils/text.py --lang_type japanese --tar_path data/raw/ --save_path dat
 
 ```bash
 $ make
-$ ./cstm -n_dim=20 -ignore_word_count=0 -epoch=100 -data_path=[string: your data] -model_path=[string: saveplace]
+$ ./cstm -n_dim=20 -ignore_word_count=0 -epoch=100 -data_path=./data/train/ -model_path=./model/cstm.model
 ```
 
 ## Reference
