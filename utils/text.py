@@ -1,4 +1,5 @@
 import argparse
+import os
 import MeCab
 
 class Text(object):
@@ -34,14 +35,19 @@ class Text(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='this script for text processing.')
     parser.add_argument('--lang_type', help='english or japanese')
-    parser.add_argument('--tar_path', help='text file path you want to process')
-    parser.add_argument('--save_path', help='path you wanto to save processed text')
+    parser.add_argument('--tar_path', help='directory located raw file')
+    parser.add_argument('--save_path', help='directory save processed text')
     args = parser.parse_args()
+    filelist = os.listdir(args.tar_path)
     if args.lang_type.lower() == 'japanese':
-        t = Text(args.tar_path)
-        t._wakati_ja(args.save_path)
+        for file in filelist:
+            if file.endswith(".txt"):
+                t = Text(args.tar_path+file)
+                t._wakati_ja(args.save_path+file)
     elif args.lang_type.lower() == 'english':
-        t = Text(args.tar_path)
-        t._wakati_en(args.save_path)
+        for file in filelist:
+            if file.endswith(".txt"):
+                t = Text(args.tar_path+file)
+                t._wakati_en(args.save_path+file)
     else:
         print("Error: this script does not support language of got file")
