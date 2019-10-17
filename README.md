@@ -19,10 +19,12 @@ trained latent word vector(corpus: NIPS, dim: 20)
 ## Environment
 
 - C++ 17+
-- clang++ 10.0
+- clang++ 9.0
 - boost 1.71.0
 - glog 0.4.0
 - gflag 2.2.2
+- boost-python37 (**installed via homebrew**)
+- python3.7 (**installed via homebrew**)
 
 ## Usage
 
