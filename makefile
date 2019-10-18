@@ -11,7 +11,7 @@ cstm:
 	$(CC) -o cstm src/model.cpp $(BOOST) $(FMATH) $(GFLAGS)
 
 pycstm:
-	$(CC) -Wall -DPIC -shared -fPIC -o pycstm.so pycstm.cpp $(PYTHON) $(INCLUDE) $(LDFLAGS) $(BOOST) $(FMATH) $(GFLAGS)
+	$(CC) -Wall -DPIC -shared -fPIC -o pycstm.so pycstm.cpp $(INCLUDE) $(LDFLAGS) $(PYTHON) $(BOOST) $(FMATH) $(GFLAGS)
 
 test:
 	$(CC) -o cstm src/model.cpp $(LLDB) $(BOOST) $(FMATH) $(GFLAGS)
