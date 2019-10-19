@@ -28,7 +28,7 @@ trained latent word vector(corpus: NIPS, dim: 20)
 
 ## Usage
 
-- prepare text data with mecab-python3
+- process text data with mecab-python3
 
 ```bash
 $ python utils/text.py --lang_type japanese --tar_path data/raw/ --save_path data/train/
@@ -60,11 +60,11 @@ experimental setting as follows:
 
 ### word vectors of 1-2 dimentions
 
-![](https://seiichiinoue.github.io/img/word_plot_1_2.png)
+![](https://seiichiinoue.github.io/img/wordvec_1_2.png)
 
 ### word vectors of 9-10 dimentions
 
-![](https://seiichiinoue.github.io/img/word_plot_9_10.png)
+![](https://seiichiinoue.github.io/img/wordvec_9_10.png)
 
 ## Reference
 
