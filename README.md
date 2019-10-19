@@ -41,11 +41,12 @@ $ make
 $ ./cstm -n_dim=20 -ignore_word_count=0 -epoch=100 -data_path=./data/train/ -model_path=./model/cstm.model
 ```
 
-- load CSTM model and visualize documents vector
+- load CSTM model and plot vector
 
 ```bash
 $ make install
-$ python3 utils/visualize.py
+$ python3 utils/plot_doc.py
+$ python3 utils/plot_word.py
 ```
 
 ## Reference
