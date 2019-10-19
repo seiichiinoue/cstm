@@ -5,6 +5,7 @@ import seaborn as sns
 import argparse, sys, os
 sys.path.append(os.getcwd())
 import pycstm
+# we downloaded ipa font from https://ipafont.ipa.go.jp/node17#jp
 plt.rcParams['font.family'] = 'IPAGothic'
 sns.set(font=["IPAGothic"], font_scale=2)
 
