@@ -1,10 +1,5 @@
 # Continuous Space Topic Model
 
-## Todo
-
-- python wrapper with boost-python
-- script for plot vector
-
 ## Description
 
 the implementation of [Modeling Text through Gaussian Processes](http://chasen.org/~daiti-m/paper/nl213cstm.pdf) with C++
