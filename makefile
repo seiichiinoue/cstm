@@ -8,13 +8,13 @@ INCLUDE = -I/usr/local/lib `/usr/local/Cellar/python/3.7.4_1/bin/python3.7-confi
 LDFLAGS = `/usr/local/Cellar/python/3.7.4_1/bin/python3.7-config --ldflags`
 
 cstm:
-	$(CC) -o cstm src/model.cpp $(BOOST) $(FMATH) $(GFLAGS)
+	$(CC) -O3 -o cstm src/model.cpp $(BOOST) $(FMATH) $(GFLAGS)
 
-pycstm:
-	$(CC) -Wall -DPIC -shared -fPIC -o pycstm.so pycstm.cpp $(INCLUDE) $(LDFLAGS) $(PYTHON) $(BOOST) $(FMATH) $(GFLAGS)
+install:
+	$(CC) -O3 -DPIC -shared -fPIC -o pycstm.so pycstm.cpp $(INCLUDE) $(LDFLAGS) $(PYTHON) $(BOOST) $(FMATH) $(GFLAGS)
 
 test:
-	$(CC) -o cstm src/model.cpp $(LLDB) $(BOOST) $(FMATH) $(GFLAGS)
+	$(CC) -O3 -Wall -o cstm src/model.cpp $(LLDB) $(BOOST) $(FMATH) $(GFLAGS)
 
 clean:
 	rm -f cstm
