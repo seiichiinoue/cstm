@@ -134,6 +134,34 @@ public:
         }
         return result;
     }
+    python::list get_words() {
+        python::list result;
+        for (id word_id=0; word_id<get_vocabulary_size(); ++word_id) {
+            int count = _word_frequency[word_id];
+            wstring word = _vocab->word_id_to_string(word_id);
+            double *vector = get_word_vector(word_id);
+            unordered_set<int> &doc_ids = _docs_containing_word[word_id];
+            python::list tuple;
+            tuple.append(word_id);
+            tuple.append(word);
+            tuple.append(count);
+            tuple.append(_convert_vector_to_list(vector));
+            python::list docs;
+            for (const int doc_id : doc_ids) {
+                docs.append(doc_id);
+            }
+            tuple.append(docs);
+            result.append(tuple);
+        }
+        return result;
+    }
+    python::list get_doc_filenames() {
+        python::list result;
+        for (auto doc : _doc_filename_to_id) {
+            result.append(doc.first);
+        }
+        return result;
+    }
 };
 
 BOOST_PYTHON_MODULE(pycstm) {
@@ -149,5 +177,8 @@ BOOST_PYTHON_MODULE(pycstm) {
     .def("get_word_vectors", &PyCSTM::get_word_vectors)
     .def("get_doc_vectors", &PyCSTM::get_doc_vectors)
     .def("get_word_vector_by_id", &PyCSTM::get_word_vector_by_id)
+    .def("get_high_freq_words", &PyCSTM::get_high_freq_words)
+    .def("get_words", &PyCSTM::get_words)
+    .def("get_doc_filenames", &PyCSTM::get_doc_filenames)
     .def("load", &PyCSTM::load);
 }
