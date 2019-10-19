@@ -108,7 +108,14 @@ public:
     unordered_map<int, int> _num_updates_doc;
 
     CSTMTrainer() {
+        // lang code settings
         setlocale(LC_CTYPE, "ja_JP.UTF-8");
+        ios_base::sync_with_stdio(false);
+        locale default_loc("ja_JP.UTF-8");
+        locale::global(default_loc);
+        locale ctype_default(locale::classic(), default_loc, locale::ctype);
+        wcout.imbue(ctype_default);
+        wcin.imbue(ctype_default);
         _cstm = new CSTM();
         _vocab = new Vocab();
         _old_vec_copy = NULL;
