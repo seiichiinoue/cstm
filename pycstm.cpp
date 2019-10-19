@@ -110,7 +110,7 @@ public:
 };
 
 BOOST_PYTHON_MODULE(pycstm) {
-    python::class_<PyCSTM>("cstm")
+    python::class_<PyCSTM>("cstm", python::init<string>())
     .def("get_num_documents", &PyCSTM::get_num_documents)
     .def("get_vocabulary_size", &PyCSTM::get_vocabulary_size)
     .def("get_ndim_d", &PyCSTM::get_ndim_d)
