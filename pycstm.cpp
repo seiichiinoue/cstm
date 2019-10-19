@@ -108,6 +108,32 @@ public:
         }
         return vector_array;
     }
+    python::list get_high_freq_words(size_t size=100) {
+        std::pair<id, int> pair;
+        multiset<std::pair<id, int>, multiset_comparator<int>> ranking;
+        for (id word_id=0; word_id<get_vocabulary_size(); ++word_id) {
+            int count = _word_frequency[word_id];
+            pair.first = word_id;
+            pair.second = count;
+            ranking.insert(pair);
+        }
+        python::list result;
+        auto itr = ranking.begin();
+        for (int n=0; n<std::min(size, ranking.size()); ++n) {
+            python::list tuple;
+            id word_id = itr->first;
+            wstring word = _vocab->word_id_to_string(word_id);
+            double *vector = get_word_vector(word_id);
+            int count = itr->second;
+            tuple.append(word_id);
+            tuple.append(word);
+            tuple.append(count);
+            tuple.append(_convert_vector_to_list(vector));
+            result.append(tuple);
+            itr++;
+        }
+        return result;
+    }
 };
 
 BOOST_PYTHON_MODULE(pycstm) {
