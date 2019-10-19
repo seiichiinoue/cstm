@@ -13,6 +13,7 @@ public:
     unordered_map<string, int> _doc_filename_to_id;
     unordered_map<int, string> _doc_id_to_filename;
     PyCSTM(string filename) {
+        assert(load(filename) == true);
         int ndim_d = get_ndim_d();
         _vec_copy = new double[ndim_d];
     }
