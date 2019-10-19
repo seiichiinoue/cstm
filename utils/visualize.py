@@ -1,5 +1,5 @@
 import argparse, sys, os
-sys.path.append(os.path.split(os.getcwd())[0])
+sys.path.append(os.getcwd())
 import pycstm
 
 if __name__ == "__main__":
