@@ -23,8 +23,8 @@ trained latent word vector(corpus: NIPS, dim: 20)
 - boost 1.71.0
 - glog 0.4.0
 - gflag 2.2.2
-- boost-python37 (installed via homebrew)
-- python3.7 (installed via homebrew)
+- boost-python3
+- python3
 
 ## Usage
 
