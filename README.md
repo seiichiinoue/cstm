@@ -49,6 +49,23 @@ $ python3 utils/plot_doc.py
 $ python3 utils/plot_word.py
 ```
 
+## Experimental Result
+
+experimental setting as follows:
+
+- dimention of latent coordinates = 20
+- vocabulary size =  15349
+- num of documents = 2 (too small)
+- num of words = 292584
+
+### word vectors of 1-2 dimentions
+
+![](https://seiichiinoue.github.io/img/word_plot_1_2.png)
+
+### word vectors of 9-10 dimentions
+
+![](https://seiichiinoue.github.io/img/word_plot_9_10.png)
+
 ## Reference
 
 - [Modeling Text through Gaussian Processes](http://chasen.org/~daiti-m/paper/nl213cstm.pdf)
