@@ -16,5 +16,6 @@
 model/*
 boost_test/*
 old/*
+data/fig/*
 # for debug
 cstm.dSYM/*
