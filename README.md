@@ -41,6 +41,13 @@ $ make
 $ ./cstm -n_dim=20 -ignore_word_count=0 -epoch=100 -data_path=./data/train/ -model_path=./model/cstm.model
 ```
 
+- load CSTM model and visualize documents vector
+
+```bash
+$ make install
+$ python3.7 utils/visualize.py
+```
+
 ## Reference
 
 - [Modeling Text through Gaussian Processes](http://chasen.org/~daiti-m/paper/nl213cstm.pdf)
