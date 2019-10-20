@@ -5,14 +5,6 @@ import argparse, sys, os
 sys.path.append(os.getcwd())
 import pycstm
 
-# def plot_kde(data, filename):
-#     fig = plt.gcf()
-#     fig.set_size_inches(16.0, 16.0)
-#     plt.clf()
-#     ax = sns.kdeplot(data[:, 0], data[:, 1], shade=True, cmap="Greens", n_levels=30, clip=[[-4, 4]] * 2)
-#     kde = ax.get_figure()
-#     kde.savefig('./data/fig/'+filename+'.png')
-
 def plot_scatter(data, filename):
     fig = plt.gcf()
     fig.set_size_inches(16.0, 16.0)
