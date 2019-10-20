@@ -26,7 +26,7 @@ trained latent word vector(corpus: NIPS, dim: 20)
 - process text data with mecab-python3
 
 ```bash
-$ python utils/text.py --lang_type japanese --tar_path data/raw/ --save_path data/train/
+$ python utils/process.py --lang_type japanese --tar_path data/raw/ --save_path data/train/
 ```
 
 - training CSTM with MCMC
@@ -35,6 +35,7 @@ $ python utils/text.py --lang_type japanese --tar_path data/raw/ --save_path dat
 $ make
 $ ./cstm -n_dim=20 -ignore_word_count=0 -epoch=100 -data_path=./data/train/ -model_path=./model/cstm.model
 ```
+
 
 - load CSTM model and plot vector
 
