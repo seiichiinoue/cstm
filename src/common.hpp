@@ -15,7 +15,7 @@ namespace cstm {
         return std::exp(x);
     }
 
-    double norm(double *a, double *b, int length) {
+    double norm(double *a, int length) {
         double norm = 0;
         for (int i=0; i<length; ++i) {
             norm += a[i] * a[i];
