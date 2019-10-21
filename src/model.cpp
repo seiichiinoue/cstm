@@ -518,11 +518,13 @@ DEFINE_double(sigma_alpha0, 0.2, "params: sigma_alpha0");
 DEFINE_int32(gamma_alpha_a, 5, "params: gamma_alpha_a");
 DEFINE_int32(gamma_alpha_b, 500, "params: gamma_alpha_b");
 DEFINE_int32(ignore_word_count, 0, "number of ignore word");
-DEFINE_int32(epoch, 10, "num of epoch");
+DEFINE_int32(epoch, 1000, "num of epoch");
 DEFINE_string(data_path, "./data/train/", "directory input data located");
 DEFINE_string(model_path, "./model/cstm.model", "saveplace of model");
 
-int main() {
+int main(int argc, char *argv[]) {
+    google::InitGoogleLogging(*argv);
+    google::ParseCommandLineFlags(&argc, &argv, true);
     // set hyper parameter
     CSTMTrainer trainer;
     trainer.set_ndim_d(FLAGS_ndim_d);
@@ -555,7 +557,7 @@ int main() {
     std::cout << "num of words: " << trainer.get_sum_word_frequency() << std:: endl;
     // training
     for (int i=0; i<FLAGS_epoch; ++i) {
-        for (int j=0; j<1000; ++j) {
+        for (int j=0; j<10000; ++j) {
             trainer.perform_mh_sampling_document();
             trainer.perform_mh_sampling_word();
             // updating alpha0 is bottleneck
