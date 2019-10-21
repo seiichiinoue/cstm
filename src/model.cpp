@@ -518,7 +518,7 @@ DEFINE_double(sigma_alpha0, 0.2, "params: sigma_alpha0");
 DEFINE_int32(gamma_alpha_a, 5, "params: gamma_alpha_a");
 DEFINE_int32(gamma_alpha_b, 500, "params: gamma_alpha_b");
 DEFINE_int32(ignore_word_count, 0, "number of ignore word");
-DEFINE_int32(epoch, 1000, "num of epoch");
+DEFINE_int32(epoch, 100, "num of epoch");
 DEFINE_string(data_path, "./data/train/", "directory input data located");
 DEFINE_string(model_path, "./model/cstm.model", "saveplace of model");
 
@@ -561,7 +561,7 @@ int main(int argc, char *argv[]) {
             trainer.perform_mh_sampling_document();
             trainer.perform_mh_sampling_word();
             // updating alpha0 is bottleneck
-            if (j % 100 == 0) {
+            if (j % 1000 == 0) {
                 trainer.perform_mh_sampling_alpha0();
             }
         }
