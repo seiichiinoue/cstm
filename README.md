@@ -13,7 +13,7 @@ trained latent word vector(corpus: NIPS, dim: 20)
 
 ## Environment
 
-- C++ 17+
+- C++ 14+
 - clang++ 9.0
 - boost 1.71.0
 - glog 0.4.0
@@ -29,7 +29,7 @@ trained latent word vector(corpus: NIPS, dim: 20)
 $ python3 utils/process.py --tar_path data/raw/ --save_path data/train/
 ```
 
-- training CSTM with MCMC
+- training CSTM with MH algorithm
 
 ```bash
 $ make
