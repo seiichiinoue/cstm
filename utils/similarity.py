@@ -21,7 +21,7 @@ def levenshtein(s1, s2):
     return dp[n][m]
 
 def find_sim_words(tar):
-    cstm = pycstm.cstm("./model/cstm_nichiren.model")
+    cstm = pycstm.cstm("./model/cstm.model")
     ndim_d = cstm.get_ndim_d()
 
     words = cstm.get_words_similar_to_word(tar, 30)
@@ -33,7 +33,7 @@ def find_sim_words(tar):
 
 def find_sim_docs(tar):
     tar = tar
-    cstm = pycstm.cstm("./model/cstm_nichiren.model")
+    cstm = pycstm.cstm("./model/cstm.model")
     ndim_d = cstm.get_ndim_d()
 
     filenames = cstm.get_doc_filenames()

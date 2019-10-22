@@ -2,7 +2,7 @@ import argparse, os, unicodedata
 import MeCab
 
 class Text(object):
-    def __init__(self, path="data/wiki.txt"):
+    def __init__(self, path="./data/train/kokoro.txt"):
         self.wakati = MeCab.Tagger('-Owakati')
         self.chasen = MeCab.Tagger('-Ochasen')
         with open(path, "r", encoding="utf-8") as f:
