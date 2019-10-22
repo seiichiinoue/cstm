@@ -45,6 +45,12 @@ $ python3 utils/plot_doc.py
 $ python3 utils/plot_word.py
 ```
 
+- caluculation cosine similarity between words/docs
+
+```bash
+$ python3 utils/similarity.py
+```
+
 ## Reference
 
 - [Modeling Text through Gaussian Processes](http://chasen.org/~daiti-m/paper/nl213cstm.pdf)
