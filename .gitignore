@@ -9,6 +9,7 @@
 !*.md
 !.gitignore
 !makefile
+!dockerfile
 !data/raw/*
 !data/train/*
 
