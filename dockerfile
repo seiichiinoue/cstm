@@ -1,6 +1,6 @@
 # image
 FROM ubuntu:14.04
-# install gcc for compiler development
+
 RUN apt-get update && apt-get install -y libboost-all-dev python3-dev git cmake g++ gdb python3-dbg vim
 
 # language environment settings
