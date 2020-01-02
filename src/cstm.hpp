@@ -186,7 +186,6 @@ namespace cstm {
         }
         // compute alpha: \alpha_{d, k} = \alpha_0 * G_0(w_k) * \exp(\phi(w_k)^T * u_d)
         double _compute_alpha_word(double *word_vec, double *doc_vec, double g0) {
-            // kernel := inner product
             double f = cstm::inner(word_vec, doc_vec, _ndim_d);   // inner product
             double alpha = _alpha0 * g0 * cstm::exp(f);
             return alpha;
