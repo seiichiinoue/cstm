@@ -33,7 +33,7 @@ $ python3 utils/process.py --tar_path data/raw/ --save_path data/train/
 
 ```bash
 $ make
-$ ./cstm -n_dim=20 -ignore_word_count=0 -epoch=100 -data_path=./data/train/ -model_path=./model/cstm.model
+$ ./cstm -ndim_d=20 -ignore_word_count=0 -epoch=100 -data_path=./data/train/ -model_path=./model/cstm.model
 ```
 
 
