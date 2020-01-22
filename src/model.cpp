@@ -379,9 +379,13 @@ public:
             log_pw_new += _cstm->_compute_reduced_log_probability_document(word_id, doc_id, n_k, new_Zi, new_alpha_word);
             _Zi_cache[doc_id] = new_Zi;
         }
+        assert(log_pw_old != 0);
+        assert(log_pw_new != 0);
         // prior distribution
         double log_prior_old = _cstm->compute_log_prior_vector(old_word_vec);
         double log_prior_new = _cstm->compute_log_prior_vector(new_word_vec);
+        assert(log_prior_old != 0);
+        assert(log_prior_new != 0);
         // acceptance rate
         double log_acceptance_rate = log_pw_new + log_prior_new - log_pw_old - log_prior_old;
         double acceptance_ratio = std::min(1.0, cstm::exp(log_acceptance_rate));
@@ -421,6 +425,8 @@ public:
         _cstm->set_doc_vector(doc_id, new_doc_vec);
         _cstm->update_Zi(doc_id);
         double log_pw_new = _cstm->compute_log_probability_document(doc_id);
+        assert(log_pw_old != 0);
+        assert(log_pw_new != 0);
         // prior distribution
         double log_prior_old = _cstm->compute_log_prior_vector(old_doc_vec);
         double log_prior_new = _cstm->compute_log_prior_vector(new_doc_vec);
