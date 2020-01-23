@@ -48,7 +48,7 @@ $ python3 utils/plot_word.py
 - caluculation cosine similarity between words/docs
 
 ```bash
-$ python3 utils/similarity.py
+$ python3 utils/similarity.py -word TARGET_WORD
 ```
 
 ## Reference
