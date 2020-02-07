@@ -14,7 +14,6 @@ namespace cstm {
     double exp(double x) {
         return std::exp(x);
     }
-
     double norm(double *a, int length) {
         double norm = 0;
         for (int i=0; i<length; ++i) {
@@ -22,7 +21,6 @@ namespace cstm {
         }
         return sqrt(norm);
     }
-
     double inner(double *a, double *b, int length) {
         double inner = 0;
         for (int i=0; i<length; ++i) {
