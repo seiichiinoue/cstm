@@ -134,14 +134,14 @@ public:
     }
 
     void reset_statistics() {
-        int _num_acceptance_doc = 0;    
-        int _num_acceptance_word = 0;
-        int _num_acceptance_alpha0 = 0;
-        int _num_rejection_doc = 0;
-        int _num_rejection_word = 0;
-        int _num_rejection_alpha0 = 0;
-        int _num_word_vec_sampled = 0;
-        int _num_doc_vec_sampled = 0;
+        _num_acceptance_doc = 0;    
+        _num_acceptance_word = 0;
+        _num_acceptance_alpha0 = 0;
+        _num_rejection_doc = 0;
+        _num_rejection_word = 0;
+        _num_rejection_alpha0 = 0;
+        _num_word_vec_sampled = 0;
+        _num_doc_vec_sampled = 0;
     }
 
     void prepare() {
@@ -379,8 +379,8 @@ public:
             log_pw_new += _cstm->_compute_reduced_log_probability_document(word_id, doc_id, n_k, new_Zi, new_alpha_word);
             _Zi_cache[doc_id] = new_Zi;
         }
-        assert(log_pw_old != 0);
-        assert(log_pw_new != 0);
+        // assert(log_pw_old != 0);
+        // assert(log_pw_new != 0);
         // prior distribution
         double log_prior_old = _cstm->compute_log_prior_vector(old_word_vec);
         double log_prior_new = _cstm->compute_log_prior_vector(new_word_vec);
