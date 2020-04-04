@@ -194,7 +194,7 @@ public:
         // read file
         wstring sentence;
         vector<wstring> sentences;
-        while (getline(ifs, sentence) && !sentence.empty()) {
+        while (getline(ifs, sentence) && !ifs.eof()) {
             sentences.push_back(sentence);
         }
         for (wstring &sentence : sentences) {
