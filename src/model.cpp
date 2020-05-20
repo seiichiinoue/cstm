@@ -62,9 +62,15 @@ void split_word_by(const wstring &str, wchar_t delim, vector<wstring> &elems) {
     }
 }
 
-bool ends_with(const std::string& s, const std::string& suffix) {
-    if (s.size() < suffix.size()) return false;
-    return std::equal(std::rbegin(suffix), std::rend(suffix), std::rbegin(s));
+// bool ends_with(const std::string& s, const std::string& suffix) {
+//     if (s.size() < suffix.size()) return false;
+//     return std::equal(std::rbegin(suffix), std::rend(suffix), std::rbegin(s));
+// }
+
+bool ends_with(const std::string& str, const std::string& suffix) {
+    size_t len1 = str.size();
+    size_t len2 = suffix.size();
+    return len1 >= len2 && str.compare(len1 - len2, len2, suffix) == 0;
 }
 
 class CSTMTrainer {
@@ -132,7 +138,6 @@ public:
         delete _cstm;
         delete _vocab;
     }
-
     void reset_statistics() {
         _num_acceptance_doc = 0;    
         _num_acceptance_word = 0;
@@ -143,7 +148,6 @@ public:
         _num_word_vec_sampled = 0;
         _num_doc_vec_sampled = 0;
     }
-
     void prepare() {
         int num_docs = _dataset.size();
         int vocabulary_size = _word_frequency.size();
@@ -540,20 +544,48 @@ int main(int argc, char *argv[]) {
     trainer.set_gamma_alpha_a(FLAGS_gamma_alpha_a);
     trainer.set_gamma_alpha_b(FLAGS_gamma_alpha_b);
     trainer.set_ignore_word_count(FLAGS_ignore_word_count);
+    // // read file
+    // const char* path = FLAGS_data_path.c_str();
+    // DIR *dp;
+    // dp = opendir(path);
+    // assert (dp != NULL);
+    // dirent* entry = readdir(dp);
+    // while (entry != NULL){
+    //     const char *cstr = entry->d_name;
+    //     string file_path = string(cstr);
+    //     if (ends_with(file_path, ".txt")) {
+    //         std::cout << "loading " << file_path << std::endl;
+    //         int doc_id = trainer.add_document(FLAGS_data_path + file_path);
+    //     }
+    //     entry = readdir(dp);
+    // }
     // read file
     const char* path = FLAGS_data_path.c_str();
-    DIR *dp;
-    dp = opendir(path);
-    assert (dp != NULL);
-    dirent* entry = readdir(dp);
-    while (entry != NULL){
-        const char *cstr = entry->d_name;
-        string file_path = string(cstr);
-        if (ends_with(file_path, ".txt")) {
-            std::cout << "loading " << file_path << std::endl;
-            int doc_id = trainer.add_document(FLAGS_data_path + file_path);
+    DIR *dp_author; dp_author = opendir(path);
+    assert (dp_author != NULL);
+    dirent* entry_author = readdir(dp_author);
+    while (entry_author != NULL){
+        const char *cstr = entry_author->d_name;
+        string author = string(cstr);
+        if (author == ".." || author == ".") {
+            entry_author = readdir(dp_author);
+            continue;
         }
-        entry = readdir(dp);
+        string tmp = FLAGS_data_path + author;
+        const char* path_to_file = tmp.c_str();
+        DIR *dp_file; dp_file = opendir(path_to_file);
+        assert(dp_file != NULL);
+        dirent* entry_file = readdir(dp_file);
+        while (entry_file != NULL) {
+            const char *cstr2 = entry_file->d_name;
+            string file_path = string(cstr2);
+            if (ends_with(file_path, ".txt")) {
+                // std::cout << "loading " << file_path << std::endl;
+                int doc_id = trainer.add_document(FLAGS_data_path + author + "/" + file_path);
+            }
+            entry_file = readdir(dp_file);
+        }
+        entry_author = readdir(dp_author);
     }
     // prepare model
     trainer.prepare();

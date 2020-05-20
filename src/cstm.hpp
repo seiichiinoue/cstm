@@ -188,6 +188,7 @@ namespace cstm {
         double _compute_alpha_word(double *word_vec, double *doc_vec, double g0) {
             double f = cstm::inner(word_vec, doc_vec, _ndim_d);   // inner product
             double alpha = _alpha0 * g0 * cstm::exp(f);
+            // cout << alpha << endl;
             return alpha;
         }
         // compute probability: \p_d (w | \alpha_d, n_d)
