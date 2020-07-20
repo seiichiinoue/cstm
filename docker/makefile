@@ -9,8 +9,8 @@ GFLAGS = -lglog -lgflags
 INCLUDE = -I/usr/include/
 LDFLAGS = `python3-config --includes` `python3-config --ldflags`
 
-model:
-	$(CC) -O3 $(STD) -o model cstm/model.cpp $(BOOST) $(INCLUDE) $(FMATH) $(GFLAGS) 
+cstm:
+	$(CC) -O3 $(STD) -o cstm src/model.cpp $(BOOST) $(INCLUDE) $(FMATH) $(GFLAGS) 
 
 install:
 	$(CC) -O3 $(STD) -DPIC -shared -fPIC -o pycstm.so pycstm.cpp $(INCLUDE) $(LDFLAGS) $(PYTHON) $(BOOST) $(FMATH) $(GFLAGS)
