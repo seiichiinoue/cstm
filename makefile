@@ -6,7 +6,7 @@ PYTHON = -lboost_python3-py36
 FMATH = -fomit-frame-pointer -fno-operator-names -msse2 -mfpmath=sse -march=native
 GFLAGS = -lglog -lgflags
 #-I/root/boost -L/root/boost/stage/lib -I/usr/include/boost/ 
-INCLUDE = -I/usr/include/
+INCLUDE = -I/usr/include/ -pthread
 LDFLAGS = `python3-config --includes` `python3-config --ldflags`
 
 cstm:

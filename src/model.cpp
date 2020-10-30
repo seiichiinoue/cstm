@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cstdlib>
+#include <thread>
 #include <dirent.h>
 #include <string>
 #include <set>
@@ -89,11 +90,15 @@ public:
     
     double *_old_vec_copy;
     double *_new_vec_copy;
+    double **_old_vec_copy_thread;
+    double **_new_vec_copy_thread;
     double *_old_alpha_words;
     double *_Zi_cache;
     
     int _ndim_d;
+    int _num_threads;
     int _ignored_vocabulary_size;
+    std::thread* _doc_threads;
 
     // stat
     // times of acceptance 
@@ -126,9 +131,13 @@ public:
         _vocab = new Vocab();
         _old_vec_copy = NULL;
         _new_vec_copy = NULL;
+        _old_vec_copy_thread = NULL;
+        _new_vec_copy_thread = NULL;
         _old_alpha_words = NULL;
         _Zi_cache = NULL;
+        _doc_threads = NULL;
         _ndim_d = 0;
+        _num_threads = 1;
         _ignored_vocabulary_size = 0;
         reset_statistics();
         _random_sampling_doc_index = 0;
@@ -154,6 +163,15 @@ public:
         // cache
         _old_vec_copy = new double[_ndim_d];
         _new_vec_copy = new double[_ndim_d];
+        _old_vec_copy_thread = new double*[_num_threads];
+        _new_vec_copy_thread = new double*[_num_threads];
+        for (int i=0; i<_num_threads; ++i) {
+            _old_vec_copy_thread[i] = new double[_ndim_d];
+        }
+        for (int i=0; i<_num_threads; ++i) {
+            _new_vec_copy_thread[i] = new double[_ndim_d];
+        }
+        _doc_threads = new std::thread[_num_threads];
         // CSTM
         _cstm->initialize(_ndim_d, vocabulary_size, num_docs);
         for (int doc_id=0; doc_id<num_docs; ++doc_id) {
@@ -291,6 +309,9 @@ public:
         std::memcpy(_new_vec_copy, new_vec, _cstm->_ndim_d * sizeof(double));
         return _new_vec_copy;
     }
+    void set_num_threads(int num_threads) {
+        _num_threads = num_threads;
+    }
     void set_ignore_word_count(int count){
         _cstm->set_ignore_word_count(count);
     }
@@ -408,18 +429,43 @@ public:
     }
     void perform_mh_sampling_document() {
         // choose doc vector for update
-        if (_random_sampling_doc_index >= _random_doc_ids.size()) {
+        if (_random_sampling_doc_index + _num_threads >= _random_doc_ids.size()) {
             std::shuffle(_random_doc_ids.begin(), _random_doc_ids.end(), sampler::mt);
             _random_sampling_doc_index = 0;
         }
-        int doc_id = _random_doc_ids[_random_sampling_doc_index];
-        double *old_vec = get_doc_vector(doc_id);
-        double *new_vec = draw_doc_vector(old_vec);
+        if (_num_threads == 1) {
+            int doc_id = _random_doc_ids[_random_sampling_doc_index];
+            double *old_vec = get_doc_vector(doc_id);
+            double *new_vec = draw_doc_vector(old_vec);
+            accept_document_vector_if_needed(new_vec, old_vec, doc_id);
+            _num_doc_vec_sampled += 1;
+            _num_updates_doc[doc_id] += 1;
+            _random_sampling_doc_index += 1;
+            return;
+        }
+        // multi thread
+        for (int i=0; i<_num_threads; ++i) {
+            int doc_id = _random_doc_ids[_random_sampling_doc_index + i];
+            double *old_vec = _cstm->get_doc_vector(doc_id);
+            std::memcpy(_old_vec_copy_thread[i], old_vec, _cstm->_ndim_d * sizeof(double));
+            double *new_vec = _cstm->draw_doc_vector(old_vec);
+            std::memcpy(_new_vec_copy_thread[i], new_vec, _cstm->_ndim_d * sizeof(double));
+        }
+        for (int i=0; i<_num_threads; ++i) {
+            _doc_threads[i] = std::thread(&CSTMTrainer::worker_accept_document_vector_if_needed, this, i);
+        }
+        for (int i=0; i<_num_threads; ++i) {
+            _doc_threads[i].join();
+        }
+        _random_sampling_doc_index += _num_threads;
+    }
+    void worker_accept_document_vector_if_needed(int thread_id) {
+        int doc_id = _random_doc_ids[_random_sampling_doc_index + thread_id];
+        double *old_vec = _old_vec_copy_thread[thread_id];
+        double *new_vec = _new_vec_copy_thread[thread_id];
         accept_document_vector_if_needed(new_vec, old_vec, doc_id);
         _num_doc_vec_sampled += 1;
         _num_updates_doc[doc_id] += 1;
-        _random_sampling_doc_index += 1;
-        return;
     }
     bool accept_document_vector_if_needed(double *new_doc_vec, double *old_doc_vec, int doc_id) {
         double original_Zi = _cstm->get_Zi(doc_id);
@@ -529,6 +575,7 @@ DEFINE_int32(gamma_alpha_a, 5, "params: gamma_alpha_a");
 DEFINE_int32(gamma_alpha_b, 500, "params: gamma_alpha_b");
 DEFINE_int32(ignore_word_count, 0, "number of ignore word");
 DEFINE_int32(epoch, 100, "num of epoch");
+DEFINE_int32(num_threads, 1, "num of threads");
 DEFINE_string(data_path, "./data/train/", "directory input data located");
 DEFINE_string(model_path, "./model/cstm.model", "saveplace of model");
 
@@ -544,6 +591,7 @@ int main(int argc, char *argv[]) {
     trainer.set_gamma_alpha_a(FLAGS_gamma_alpha_a);
     trainer.set_gamma_alpha_b(FLAGS_gamma_alpha_b);
     trainer.set_ignore_word_count(FLAGS_ignore_word_count);
+    trainer.set_num_threads(FLAGS_num_threads);
     // // read file
     // const char* path = FLAGS_data_path.c_str();
     // DIR *dp;
