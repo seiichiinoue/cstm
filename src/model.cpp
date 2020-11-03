@@ -566,6 +566,53 @@ public:
     }
 };
 
+void read_aozora_data(string data_path, CSTMTrainer &trainer) {
+    const char* path = data_path.c_str();
+    DIR *dp_author; dp_author = opendir(path);
+    assert (dp_author != NULL);
+    dirent* entry_author = readdir(dp_author);
+    while (entry_author != NULL){
+        const char *cstr = entry_author->d_name;
+        string author = string(cstr);
+        if (author == ".." || author == ".") {
+            entry_author = readdir(dp_author);
+            continue;
+        }
+        string tmp = data_path + author;
+        const char* path_to_file = tmp.c_str();
+        DIR *dp_file; dp_file = opendir(path_to_file);
+        assert(dp_file != NULL);
+        dirent* entry_file = readdir(dp_file);
+        while (entry_file != NULL) {
+            const char *cstr2 = entry_file->d_name;
+            string file_path = string(cstr2);
+            if (ends_with(file_path, ".txt")) {
+                // std::cout << "loading " << file_path << std::endl;
+                int doc_id = trainer.add_document(data_path + author + "/" + file_path);
+            }
+            entry_file = readdir(dp_file);
+        }
+        entry_author = readdir(dp_author);
+    }
+}
+
+void read_data(string data_path, CSTMTrainer &trainer) {
+    const char* path = data_path.c_str();
+    DIR *dp;
+    dp = opendir(path);
+    assert (dp != NULL);
+    dirent* entry = readdir(dp);
+    while (entry != NULL){
+        const char *cstr = entry->d_name;
+        string file_path = string(cstr);
+        if (ends_with(file_path, ".txt")) {
+            std::cout << "loading " << file_path << std::endl;
+            int doc_id = trainer.add_document(data_path + file_path);
+        }
+        entry = readdir(dp);
+    }
+}
+
 // hyper parameters flags
 DEFINE_int32(ndim_d, 20, "number of hidden size");
 DEFINE_double(sigma_u, 0.02, "params: sigma_u");
@@ -592,49 +639,9 @@ int main(int argc, char *argv[]) {
     trainer.set_gamma_alpha_b(FLAGS_gamma_alpha_b);
     trainer.set_ignore_word_count(FLAGS_ignore_word_count);
     trainer.set_num_threads(FLAGS_num_threads);
-    // // read file
-    // const char* path = FLAGS_data_path.c_str();
-    // DIR *dp;
-    // dp = opendir(path);
-    // assert (dp != NULL);
-    // dirent* entry = readdir(dp);
-    // while (entry != NULL){
-    //     const char *cstr = entry->d_name;
-    //     string file_path = string(cstr);
-    //     if (ends_with(file_path, ".txt")) {
-    //         std::cout << "loading " << file_path << std::endl;
-    //         int doc_id = trainer.add_document(FLAGS_data_path + file_path);
-    //     }
-    //     entry = readdir(dp);
-    // }
     // read file
-    const char* path = FLAGS_data_path.c_str();
-    DIR *dp_author; dp_author = opendir(path);
-    assert (dp_author != NULL);
-    dirent* entry_author = readdir(dp_author);
-    while (entry_author != NULL){
-        const char *cstr = entry_author->d_name;
-        string author = string(cstr);
-        if (author == ".." || author == ".") {
-            entry_author = readdir(dp_author);
-            continue;
-        }
-        string tmp = FLAGS_data_path + author;
-        const char* path_to_file = tmp.c_str();
-        DIR *dp_file; dp_file = opendir(path_to_file);
-        assert(dp_file != NULL);
-        dirent* entry_file = readdir(dp_file);
-        while (entry_file != NULL) {
-            const char *cstr2 = entry_file->d_name;
-            string file_path = string(cstr2);
-            if (ends_with(file_path, ".txt")) {
-                // std::cout << "loading " << file_path << std::endl;
-                int doc_id = trainer.add_document(FLAGS_data_path + author + "/" + file_path);
-            }
-            entry_file = readdir(dp_file);
-        }
-        entry_author = readdir(dp_author);
-    }
+    read_data(FLAGS_data_path, trainer);
+    // read_aozora_data(FLAGS_data_path, trainer);
     // prepare model
     trainer.prepare();
     // summary
