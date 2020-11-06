@@ -46,6 +46,11 @@ namespace cstm {
             }
             return sentence;
         }
+        int word_exists(wstring &str) {
+            id hash = hash_string(str);
+            auto itr = _hash_to_id.find(hash);
+            return itr != _hash_to_id.end();
+        }
         int num_words() {
             return _string_by_word_id.size();
         }

@@ -63,11 +63,6 @@ void split_word_by(const wstring &str, wchar_t delim, vector<wstring> &elems) {
     }
 }
 
-// bool ends_with(const std::string& s, const std::string& suffix) {
-//     if (s.size() < suffix.size()) return false;
-//     return std::equal(std::rbegin(suffix), std::rend(suffix), std::rbegin(s));
-// }
-
 bool ends_with(const std::string& str, const std::string& suffix) {
     size_t len1 = str.size();
     size_t len2 = suffix.size();
@@ -79,8 +74,11 @@ public:
     CSTM *_cstm;
     Vocab *_vocab;
     vector<vector<vector<id>>> _dataset;
+    vector<vector<vector<id>>> _validation_dataset;
     vector<unordered_set<id>> _word_ids_in_doc;
+    vector<unordered_set<id>> _word_ids_in_doc_validation;
     vector<int> _sum_word_frequency;    // word frequency per document
+    vector<int> _sum_word_frequency_validation;
     vector<id> _random_word_ids;
     vector<int> _random_doc_ids;
     unordered_map<id, unordered_set<int>> _docs_containing_word;    // word -> [doc_ids]
@@ -157,7 +155,7 @@ public:
         _num_word_vec_sampled = 0;
         _num_doc_vec_sampled = 0;
     }
-    void prepare() {
+    void prepare(bool validation=false) {
         int num_docs = _dataset.size();
         int vocabulary_size = _word_frequency.size();
         // cache
@@ -185,7 +183,18 @@ public:
             _num_updates_doc[doc_id] = 0;
             _random_doc_ids.push_back(doc_id);
         }
-        _cstm->prepare();
+        if (validation) {
+            for (int doc_id=0; doc_id<num_docs; ++doc_id) {
+                vector<vector<id>> &dataset = _validation_dataset[doc_id];
+                for (int data_index=0; data_index<dataset.size(); ++data_index) {
+                    vector<id> &word_ids = dataset[data_index];
+                    for (const id word_id : word_ids) {
+                        _cstm->add_word_validation(word_id, doc_id);
+                    }
+                }
+            }
+        }
+        _cstm->prepare(validation=validation);
         // Zi
         for (int doc_id=0; doc_id<num_docs; ++doc_id) {
             _cstm->update_Zi(doc_id);
@@ -251,6 +260,50 @@ public:
             dataset.push_back(word_ids);
         }
     }
+    // for validation dataset
+    int add_validation_document(string filepath) {
+        wifstream ifs(filepath.c_str());
+        assert(ifs.fail() == false);
+        // add document
+        int doc_id = _validation_dataset.size();
+        _validation_dataset.push_back(vector<vector<id>>());
+        _word_ids_in_doc_validation.push_back(unordered_set<id>());
+        _sum_word_frequency_validation.push_back(0);
+        // read file
+        wstring sentence;
+        vector<wstring> sentences;
+        while (getline(ifs, sentence) && !ifs.eof()) {
+            sentences.push_back(sentence);
+        }
+        for (wstring &sentence : sentences) {
+            vector<wstring> words;
+            split_word_by(sentence, L' ', words);
+            add_sentence_to_doc_validation(words, doc_id);
+        }
+        return doc_id;
+    }
+    // for validation dataset
+    void add_sentence_to_doc_validation(vector<wstring> &words, int doc_id) {
+        if (words.size() > 0) {
+            vector<vector<id>> &dataset = _validation_dataset[doc_id];
+            _sum_word_frequency_validation[doc_id] += words.size();
+            vector<id> word_ids;
+            for (auto word : words) {
+                if (word.size() == 0) {
+                    continue;
+                }
+                // need to dismiss unknown words
+                if (!(_vocab->word_exists(word))) {
+                    continue;
+                }
+                id word_id = _vocab->get_word_id(word);
+                word_ids.push_back(word_id);
+                unordered_set<id> &word_set = _word_ids_in_doc_validation[doc_id];
+                word_set.insert(word_id);
+            }
+            dataset.push_back(word_ids);
+        }
+    }
     bool is_doc_contain_word(int doc_id, id word_id) {
         unordered_set<int> &set = _docs_containing_word[word_id];
         auto itr = set.find(doc_id);
@@ -270,6 +323,10 @@ public:
     }
     int get_sum_word_frequency() {
         return std::accumulate(_sum_word_frequency.begin(), _sum_word_frequency.end(), 0);
+    }
+    // for validation dataset
+    int get_sum_word_frequency_validation() {
+        return std::accumulate(_sum_word_frequency_validation.begin(), _sum_word_frequency_validation.end(), 0);
     }
     int get_num_word_vec_sampled() {
         return _num_word_vec_sampled;
@@ -345,6 +402,16 @@ public:
         }
         return log_pw;
     }
+    // for validation dataset
+    double compute_log_likelihood_validation_data() {
+        double log_pw = 0;
+        int n = 0;
+        for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
+            unordered_set<id> &word_ids = _word_ids_in_doc_validation[doc_id];
+            log_pw += _cstm->compute_log_probability_validation_document_given_words(doc_id, word_ids);
+        }
+        return log_pw;
+    }
     double compute_perplexity() {
         double log_pw = 0;
         int n = 0;
@@ -353,6 +420,16 @@ public:
             log_pw += _cstm->compute_log_probability_document_given_words(doc_id, word_ids);
         }
         return cstm::exp(-log_pw / get_sum_word_frequency());
+    }
+    // for validation dataset
+    double compute_validation_perplexity() {
+        double log_pw = 0;
+        int n = 0;
+        for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
+            unordered_set<id> &word_ids = _word_ids_in_doc_validation[doc_id];
+            log_pw += _cstm->compute_log_probability_validation_document_given_words(doc_id, word_ids);
+        }
+        return cstm::exp(-log_pw / get_sum_word_frequency_validation());
     }
     void update_all_Zi() {
         for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
@@ -606,8 +683,25 @@ void read_data(string data_path, CSTMTrainer &trainer) {
         const char *cstr = entry->d_name;
         string file_path = string(cstr);
         if (ends_with(file_path, ".txt")) {
-            std::cout << "loading " << file_path << std::endl;
+            // std::cout << "loading " << file_path << std::endl;
             int doc_id = trainer.add_document(data_path + file_path);
+        }
+        entry = readdir(dp);
+    }
+}
+
+void read_validation_data(string data_path, CSTMTrainer &trainer) {
+    const char* path = data_path.c_str();
+    DIR *dp;
+    dp = opendir(path);
+    assert (dp != NULL);
+    dirent* entry = readdir(dp);
+    while (entry != NULL){
+        const char *cstr = entry->d_name;
+        string file_path = string(cstr);
+        if (ends_with(file_path, ".txt")) {
+            // std::cout << "loading " << file_path << std::endl;
+            int doc_id = trainer.add_validation_document(data_path + file_path);
         }
         entry = readdir(dp);
     }
@@ -623,7 +717,8 @@ DEFINE_int32(gamma_alpha_b, 500, "params: gamma_alpha_b");
 DEFINE_int32(ignore_word_count, 0, "number of ignore word");
 DEFINE_int32(epoch, 100, "num of epoch");
 DEFINE_int32(num_threads, 1, "num of threads");
-DEFINE_string(data_path, "./data/train/", "directory input data located");
+DEFINE_string(data_path, "./data/train/", "directory train data located");
+DEFINE_string(validation_data_path, "null", "directory validation data located");
 DEFINE_string(model_path, "./model/cstm.model", "saveplace of model");
 
 int main(int argc, char *argv[]) {
@@ -639,13 +734,19 @@ int main(int argc, char *argv[]) {
     trainer.set_gamma_alpha_b(FLAGS_gamma_alpha_b);
     trainer.set_ignore_word_count(FLAGS_ignore_word_count);
     trainer.set_num_threads(FLAGS_num_threads);
+    bool validation = (FLAGS_validation_data_path != "null");
     // read file
     read_data(FLAGS_data_path, trainer);
     // read_aozora_data(FLAGS_data_path, trainer);
+    if (validation) {
+        read_validation_data(FLAGS_validation_data_path, trainer);
+    }
     // prepare model
-    trainer.prepare();
+    trainer.prepare(validation=validation);
     // summary
     std::cout << "vocabulary size: " << trainer.get_vocabulary_size() << std::endl;
+    std::cout << "ignored vocabulary size: " << trainer.get_ignored_vocabulary_size() << std::endl;
+    std::cout << "actual vocabulary size: " << trainer.get_vocabulary_size() - trainer.get_ignored_vocabulary_size() << std::endl;
     std::cout << "num of documents: " << trainer.get_num_documents() << std::endl;
     std::cout << "num of words: " << trainer.get_sum_word_frequency() << std:: endl;
     // training
@@ -662,6 +763,11 @@ int main(int argc, char *argv[]) {
         // logging temporary result
         std::cout << "perplexity: " << trainer.compute_perplexity() << std::endl;
         std::cout << "log likelihood: " << trainer.compute_log_likelihood_data() << std::endl;
+        // logging score for validation dataset if validation == true
+        if (validation) {
+            std::cout << "validation perplexity: " << trainer.compute_validation_perplexity() << std::endl;
+            std::cout << "validation log likelihood: " << trainer.compute_log_likelihood_validation_data() << std::endl;
+        }
         // logging statistics
         std::cout << "MH acceptance:" << std::endl;
         std::cout << "    document: " << trainer.get_mh_acceptance_rate_for_doc_vector() << std::endl;
