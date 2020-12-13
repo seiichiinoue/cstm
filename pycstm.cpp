@@ -73,6 +73,12 @@ public:
         std::memcpy(_vec_copy, original_vec, _cstm->_ndim_d * sizeof(double));
         return _vec_copy;
     }
+    double calc_gaussian_process(int doc_id, id word_id) {
+        double *doc_vec = _cstm->get_doc_vector(doc_id);
+        double *word_vec = _cstm->get_word_vector(word_id);
+        double f = cstm::inner(word_vec, doc_vec, _cstm->_ndim_d);
+        return f;
+    }
     python::list _convert_vector_to_list(double *vector) {
         python::list vector_list;
         for (int i=0; i<_cstm->_ndim_d; ++i) {
@@ -107,6 +113,64 @@ public:
             vector_array.append(vector_list);
         }
         return vector_array;
+    }
+    python::list get_high_prob_words_in_documents(int doc_id, size_t size=20) {
+        unordered_set<id> &word_ids = _word_ids_in_doc[doc_id];
+        std::pair<id, double> pair;
+        multiset<std::pair<id, double>, multiset_comparator<double>> ranking;
+        // for (id word_id : word_ids) {
+        for (id word_id=0; word_id<get_vocabulary_size(); ++word_id) {
+            int count = _word_frequency[word_id];
+            // if (count < _cstm->get_ignore_word_count()) continue;
+            if (count < 100) continue;
+            double f = calc_gaussian_process(doc_id, word_id);
+            pair.first = word_id;
+            pair.second = f;
+            ranking.insert(pair);
+        }
+        python::list result;
+        auto itr = ranking.begin();
+        for (int n=0; n<std::min(size, ranking.size()); ++n) {
+            python::list tuple;
+            id word_id = itr->first;
+            wstring word = _vocab->word_id_to_string(word_id);
+            double f = itr->second;
+            tuple.append(word_id);
+            tuple.append(word);
+            tuple.append(f);
+            result.append(tuple);
+            itr++;
+        }
+        return result;
+    }
+    python::list get_low_prob_words_in_documents(int doc_id, size_t size=20) {
+        unordered_set<id> &word_ids = _word_ids_in_doc[doc_id];
+        std::pair<id, double> pair;
+        multiset<std::pair<id, double>, multiset_comparator<double>> ranking;
+        // for (id word_id : word_ids) {
+        for (id word_id=0; word_id<get_vocabulary_size(); ++word_id) {
+            int count = _word_frequency[word_id];
+            // if (count < _cstm->get_ignore_word_count()) continue;
+            if (count < 100) continue;
+            double f = calc_gaussian_process(doc_id, word_id);
+            pair.first = word_id;
+            pair.second = f;
+            ranking.insert(pair);
+        }
+        python::list result;
+        auto itr = ranking.rbegin();
+        for (int n=0; n<std::min(size, ranking.size()); ++n) {
+            python::list tuple;
+            id word_id = itr->first;
+            wstring word = _vocab->word_id_to_string(word_id);
+            double f = itr->second;
+            tuple.append(word_id);
+            tuple.append(word);
+            tuple.append(f);
+            result.append(tuple);
+            itr++;
+        }
+        return result;
     }
     python::list get_high_freq_words(size_t size=100) {
         std::pair<id, int> pair;
@@ -276,6 +340,8 @@ BOOST_PYTHON_MODULE(pycstm) {
     .def("get_word_vectors", &PyCSTM::get_word_vectors)
     .def("get_doc_vectors", &PyCSTM::get_doc_vectors)
     .def("get_word_vector_by_id", &PyCSTM::get_word_vector_by_id)
+    .def("get_high_prob_words_in_documents", &PyCSTM::get_high_prob_words_in_documents)
+    .def("get_low_prob_words_in_documents", &PyCSTM::get_low_prob_words_in_documents)
     .def("get_high_freq_words", &PyCSTM::get_high_freq_words)
     .def("get_words", &PyCSTM::get_words)
     .def("get_doc_filenames", &PyCSTM::get_doc_filenames)
