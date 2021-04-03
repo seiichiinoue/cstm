@@ -83,6 +83,7 @@ public:
     vector<int> _random_doc_ids;
     unordered_map<id, unordered_set<int>> _docs_containing_word;    // word -> [doc_ids]
     unordered_map<id, int> _word_frequency;
+    unordered_map<id, int> _word_frequency_validation;
     unordered_map<string, int> _doc_filename_to_id;
     unordered_map<int, string> _doc_id_to_filename;
     
@@ -300,6 +301,7 @@ public:
                 word_ids.push_back(word_id);
                 unordered_set<id> &word_set = _word_ids_in_doc_validation[doc_id];
                 word_set.insert(word_id);
+                _word_frequency_validation[word_id] += 1;
             }
             dataset.push_back(word_ids);
         }
@@ -322,11 +324,22 @@ public:
         return _cstm->_ndim_d;
     }
     int get_sum_word_frequency() {
-        return std::accumulate(_sum_word_frequency.begin(), _sum_word_frequency.end(), 0);
+        int sum = 0;
+        for (int i=0; i<_word_frequency.size(); ++i) {
+            if (_word_frequency[i] > _cstm->get_ignore_word_count()) {
+                sum += _word_frequency[i];
+            }
+        }
+        return sum;
     }
-    // for validation dataset
     int get_sum_word_frequency_validation() {
-        return std::accumulate(_sum_word_frequency_validation.begin(), _sum_word_frequency_validation.end(), 0);
+        int sum = 0;
+        for (int i=0; i<_word_frequency_validation.size(); ++i) {
+            if (_word_frequency_validation[i] > _cstm->get_ignore_word_count()) {
+                sum += _word_frequency_validation[i];
+            }
+        }
+        return sum;
     }
     int get_num_word_vec_sampled() {
         return _num_word_vec_sampled;
